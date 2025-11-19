@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - TaskManager</title>
+  <link href="../css/login-style.css" rel="stylesheet">
+</head>
+<body>
+<div class="login">
+  <div class="login-container">
+
+    <div class="header">
+      <img src="../media/logo.png" alt="logo" class="login-logo">
+      <p class="app-title">TaskManager</p><br/>
+    </div>
+
+    <p class="login-text">Zarejestruj się w aplikacji</p><br/>
+
+    <form class="login-form" method="post" action="index.html">
+      <label class="login-form-text" for="username"> Username: </label>
+      <input type="text" id="username" name="username"><br/>
+      <label class = "login-form-text" for="password"> Password: </label>
+      <div class="password-container">
+        <input type="password" id="password" name="password">
+        <span class="toggle-password" id="togglePassword">👁</span>
+      </div>
+      <label class = "login-form-text" for="password"> Confirm password: </label>
+      <div class="password-container">
+        <input type="password" id="password-confirm" name="password-confirm">
+        <span class="toggle-password" id="togglePassword-confirm">👁</span>
+      </div>
+      <button type="submit">Zarejestruj</button>
+      <span id="message"></span>
+    </form>
+
+
+  </div>
+</div>
+</body>
+</html>

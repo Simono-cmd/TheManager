@@ -1,0 +1,261 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #393838;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+header #title-container {
+    display: flex;
+    align-items: center;
+}
+
+header #logo {
+    max-height: 4em;
+    max-width: 4em;
+    margin: 0.5em;
+}
+
+header #title {
+    color: #ffffff;
+    font-family: Garamond, serif;
+    font-weight: bold;
+    font-size: 2em;
+    margin-left: 0.5em;
+}
+
+header #profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 1em;
+}
+
+header .profile-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 2em;
+}
+
+header .dropdown {
+    position: absolute;
+    top: 3.4em;
+    right: 0;
+    background: white;
+    color: black;
+    width: 8em;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+    font-family: Garamond, serif;
+    font-weight: bold;
+}
+
+header .profile-wrapper:hover .dropdown {
+    opacity: 1;
+    visibility: visible;
+}
+
+header .dropdown ul {
+    padding: 0;
+    margin-top: 10px;
+}
+
+header .dropdown ul li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+header .dropdown ul li:hover {
+    background: #dfd9d9;
+}
+
+.sidebar {
+    min-width: 14em;
+    width: 20vw;
+    background: #2e2d2d;
+    color: white;
+    padding: 10px;
+    position: fixed;
+    top: 5em;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+#sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.5em 0 0.5em;
+}
+
+#sidebar-top p {
+    font-size: 20px;
+}
+
+#sidebar-top button {
+    font-size: 20px;
+    background-color: #567dc2;
+    border: none;
+    border-radius: 10em;
+    cursor: pointer;
+    color: white;
+}
+
+#sidebar-top button:hover {
+    box-shadow: 0 0 0 6px rgba(31, 74, 113, 0.63);
+}
+
+.board-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.board-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #3b3a3a;
+    padding: 1em 0.5em 1em 1em;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+.board-item:hover {
+    background: #4a4949;
+}
+
+.board-name {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.actions button {
+    display: flex;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 2em;
+}
+
+.actions .edit-btn:hover {
+    background: rgba(0, 119, 255, 0.36);
+}
+
+.actions .delete-btn:hover {
+    background: rgba(255, 0, 0, 0.34);
+}
+
+.icon {
+    align-items: center;
+    aspect-ratio: 1/1;
+    max-width: 1.5em;
+}
+
+.task-container {
+    margin-left: clamp(13%, 20vw, 7.5em);
+    padding:10px;
+}
+
+.task-container h1 {
+    font-family: Garamond, serif;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+.task-card {
+    background: #ffffff;
+    border-radius: 1em;
+    padding: 1em;
+    min-width: 10em;
+    width: 15vw;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.33);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+}
+
+.task-title {
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5em;
+}
+
+.task-desc {
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.task-actions {
+    margin-top: 0.8em;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.task-actions button {
+    border: none;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.complete-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.add-task-btn {
+    position: fixed;
+    padding: 10px;
+    border-radius: 5em;
+    border: none;
+    background-color: #567dc2;
+    color: white;
+    cursor: pointer;
+    bottom: 1em;
+    right: 1.5em;
+}
+
+.container {
+    display: flex;
+    margin-top: 4em;
+    overflow: hidden;
+}
+

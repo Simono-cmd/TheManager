@@ -1,0 +1,308 @@
+body
+{
+    font-family: "Candara Light", serif;
+    background-color: #232629;
+    margin: 0;
+    padding: 0;
+}
+
+header
+{
+    background-color: rgba(79, 164, 244, 0.87);
+    max-height: 10em;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: fixed;
+
+}
+
+#title-container
+{
+    display: flex;
+    align-items: center;
+}
+
+#title-picture
+{
+    max-height: 4em;
+    max-width: 4em;
+    margin: 0.5em;
+}
+
+#title
+{
+    color: black;
+    font-family: Garamond, serif;
+    font-weight: bolder;
+    font-size: 2em;
+    margin-left: 0.5em;
+}
+
+.dropdown
+{
+    position: relative;
+    margin-right: 1em;
+}
+
+.Menu
+{
+    background-color: #2a5f8f;
+    color: #ffffff;
+    font-size: 1em;
+    min-width: 10em;
+    min-height: 3em;
+    border: none;
+    border-top-left-radius: 1em;
+    border-top-right-radius: 1em;
+    font-family: Garamond, serif;
+}
+
+.dropdown-content
+{
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #a1c8ec;
+    min-width: 10em;
+    border-bottom-left-radius: 1em;
+    border-bottom-right-radius: 1em;
+}
+
+.dropdown-content a
+{
+    display: block;
+    color: black;
+    min-width: 8em;
+    min-height: 2em;
+    text-align: center;
+    line-height: 2em;
+    text-decoration: none;
+    font-family: Garamond, serif;
+}
+
+.dropdown-content a:hover
+{
+    background-color: #c2dcf4;
+    border-radius: 1em;
+}
+
+.dropdown:hover .dropdown-content
+{
+    display: block;
+}
+
+.Menu:hover
+{
+    background-color: #1c4b75;
+}
+
+.main-grid
+{
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr 6fr 1fr;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.main-grid:first-of-type
+{
+    margin-top:7em;
+}
+
+.main-grid > :first-child
+{
+    grid-column: 2 / 3;
+    justify-self: stretch;
+}
+
+.main-grid > :last-child
+{
+    grid-column: 4 / 5;
+    justify-self: stretch;
+}
+
+.main-img
+{
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1.5/1;
+    height: auto;
+}
+
+h1
+{
+    font-size: 2.5vw;
+    text-align: justify;
+    color: #6db0ed;
+    font-weight: lighter;
+
+}
+
+h3
+{
+    font-size: 1.5vw;
+    text-align: justify;
+    color: white;
+    font-weight: lighter;
+
+}
+
+footer
+{
+    margin-top: 5em;
+    background-color: #427eb5;
+    max-height: 12em;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    bottom: 0;
+}
+
+.footer-text
+{
+    font-size: 2vw;
+    text-align: justify;
+    color: white;
+}
+
+#newsletter-container
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
+}
+
+#email
+{
+    background-color: #ffffff;
+    color: #000000;
+    border:none;
+}
+
+.newsletter-form button
+{
+    border-radius: 0.3em;
+    border: none;
+    background-color: #2a5f8f;
+    color: white;
+}
+
+.newsletter-form button:hover
+{
+    background-color: #1f4a71;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 2em 1fr 1fr 1fr 2em;
+    grid-template-rows: 5em 1fr;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5em;
+
+}
+
+.summary-grid p {
+    text-align: center;
+    grid-column: 1/6;
+    grid-row: 1/2;
+    font-size: 2.5vw;
+    color: #c2dcf4;
+    margin-bottom: 2em;
+    font-weight: bold;
+}
+
+.summary-grid > :nth-child(2)
+{
+    grid-column: 2 / 3;
+    grid-row: 2/3;
+}
+
+.summary-grid > :nth-child(3)
+{
+    grid-column: 3 / 4;
+    grid-row: 2/3;
+
+}
+
+.summary-grid > :nth-child(4)
+{
+    grid-column: 4 / 5;
+    grid-row: 2/3;
+}
+
+ul
+{
+    font-size: 1.5vw;
+    color: #3b7ebc;
+}
+
+ol
+{
+    font-size: 1.5vw;
+    color: #a1c8ec;
+}
+
+#summary-table
+{
+    font-size: 2vw;
+    color: #145385;
+}
+
+#summary-table td
+{
+    text-align: center;
+    padding: 1em;
+}
+
+#summary-table td:hover
+{
+    text-align: center;
+    padding: 1em;
+    color: #76ff4a;
+    font-size: 2.01vw;
+}
+
+#login-buttons
+{
+    display: flex;
+    gap: 1em;
+    margin-right: 1em;
+
+}
+
+#login-buttons button
+{
+    border-radius: 0.3em;
+    border: none;
+    background-color: #2a5f8f;
+    color: white;
+    min-height: 3em;
+    min-width: 7em;
+    font-family: Garamond, serif;
+    font-size: 1em;
+}
+
+#login-buttons button:hover
+{
+    background-color: #1f4a71;
+}
+
+@media print
+{
+    body {
+        font-family: "Times New Roman", Times, serif;
+    }
+    nav {
+        display: none;
+    }
+}
