@@ -13,11 +13,12 @@
     </div>
 
     <div class="profile-wrapper">
-        <img id="profile-icon" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile">
+        <img id="profile-icon" src="../media/profile.png" alt="Profile">
 
         <div class="dropdown">
             <p>Hello, ${user}!</p>
             <ul>
+                <li><a href="dashboard.html">Dashboard</a> </li>
                 <li><a href="profile.html">Profile</a> </li>
                 <li><a href="index.html">Log out</a></li>
                 <li><a href="admin.html">Admin mode</a></li>
@@ -92,20 +93,20 @@
                     <p class="task-desc">URGENT!</p>
                     <p class="task-desc">Deadline: yesterday</p>
                     <div class="task-actions">
-                        <button class="complete-btn">✔</button>
-                        <button class="delete-btn">✕</button>
+                        <button class="complete-btn" title="mark as resolved">✔</button>
+                        <button class="delete-btn" title="mark as unresolved">✕</button>
                     </div>
                 </div>
-
-
-
             </div>
-
         </div>
-
     </div>
 </div>
-<button class="add-task-btn">+ Add Task</button>
+<div class="bottom-buttons">
+    <button class="add-task-btn">+ Add Task</button>
+    <button class="edit-task-btn"><img src="/media/edit.png" alt="edit" class="icon"> Edit Task</button>
+</div>
+
+
 
 
 </body>

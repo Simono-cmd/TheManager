@@ -1,0 +1,192 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #393838;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+}
+
+header #title-container {
+    display: flex;
+    align-items: center;
+}
+
+header #logo {
+    max-height: 4em;
+    max-width: 4em;
+    margin: 0.5em;
+}
+
+header #title {
+    color: #ffffff;
+    font-family: Garamond, serif;
+    font-weight: bold;
+    font-size: 2em;
+    margin-left: 0.5em;
+}
+
+header #profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 1em;
+}
+
+header .profile-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-right: 2em;
+}
+
+header .dropdown {
+    right: 0;
+    position: absolute;
+    top: 3.4em;
+    background: white;
+    color: black;
+    width: 10em;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    font-size: 14px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.4s;
+    font-family: Garamond, serif;
+    font-weight: bold;
+}
+
+header .profile-wrapper:hover .dropdown {
+    opacity: 1;
+    visibility: visible;
+}
+
+header .dropdown ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+header .dropdown ul li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+header .dropdown ul li:hover {
+    background: #dfd9d9;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#content-wrapper {
+    display: flex;
+    flex-direction: column;
+    font-family: Garamond, serif;
+    background-color: #272626;
+    padding: 8em 5em 1em 5em;
+}
+
+.profile-section {
+    background: #535252;
+    border-radius: 2em;
+    padding: 1em 1em 1em 1em;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+    margin-bottom: 2em;
+}
+
+.table-wrapper {
+    max-height: 18em;
+    overflow-y: auto;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.profile-section h2 {
+    font-size: 1.5em;
+    margin: 0 0 10px 0;
+    border-bottom: 2px solid #474646;
+    padding-bottom: 0.2em;
+    color: white;
+    font-weight: lighter;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.profile-table th {
+    background: #1867a8;
+    color: white;
+    padding: 12px;
+    font-size: 1.1em;
+    text-align: left;
+}
+
+.profile-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(35, 38, 41, 0.14);
+    border-right: 1px solid rgba(35, 38, 41, 0.14);
+    background: #ffffff;
+}
+
+.profile-table tr:hover td {
+    background: #ededed;
+}
+
+
+.profile-table th:first-child {
+    border-top-left-radius: 1em;
+}
+
+.profile-table th:last-child {
+    border-top-right-radius: 1em;
+}
+
+.profile-table tr:last-child td:first-child {
+    border-bottom-left-radius: 1em;
+}
+
+.profile-table tr:last-child td:last-child {
+    border-bottom-right-radius: 1em;
+}
+
+.profile-table tr:first-child td:first-child {
+    border-top-left-radius: 1em;
+}
+
+.profile-table tr:first-child td:last-child {
+    border-top-right-radius: 1em;
+}
+
+.details-btn {
+    padding: 6px 12px;
+    font-family: Garamond, serif;
+    border: none;
+    border-radius: 1em;
+    background: #1866a7;
+    color: white;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.details-btn:hover {
+    background: #2486d8;
+}
+
