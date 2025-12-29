@@ -5,7 +5,7 @@ module.exports=(sequelize) => {
         'Task',
         {
             id:{
-                type: DataTypes.INT,
+                type: DataTypes.INTEGER,
                 autoIncrement: true,
                 primaryKey: true
             },
@@ -29,6 +29,10 @@ module.exports=(sequelize) => {
                 type: DataTypes.DATE,
                 allowNull: false,
                 defaultValue: DataTypes.NOW,
+            },
+            deadline: {
+                type: DataTypes.DATE,
+                allowNull: false,
             }
         },
         {
