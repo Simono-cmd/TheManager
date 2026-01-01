@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const TaskMemberController = require('../controllers/taskMemberController');
-const authMiddleware = require("../middleware/authMiddleware");
+const taskMemberController = require('../controllers/taskMemberController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// CRUD
-router.post('/', authMiddleware,TaskMemberController.createTaskMember);
-router.get('/', authMiddleware,TaskMemberController.getAllTaskMembers);
-router.get('/:id', authMiddleware,TaskMemberController.getTaskMemberById);
-router.put('/:id', authMiddleware,TaskMemberController.updateTaskMember);
-router.delete('/:id', authMiddleware,TaskMemberController.deleteTaskMember);
+router.use(authMiddleware);
+
+router.get('/', taskMemberController.getAllTaskMembers);
+router.post('/', taskMemberController.addMember);
+router.get('/:taskId', taskMemberController.getMembersByTaskId);
+router.put('/:taskId/:userId', taskMemberController.updateMemberRole);
+router.delete('/:taskId/:userId', taskMemberController.removeMember);
 
 module.exports = router;

@@ -1,31 +1,50 @@
 import React from 'react';
+import '../../assets/styles/task-style.css';
 
-const TaskCard = ({ task, onToggleStatus, onDelete }) => {
+const TaskCard = ({ task, onEdit, onDelete, onToggleStatus }) => {
     const formattedDate = task.deadline
         ? new Date(task.deadline).toLocaleDateString('pl-PL')
-        : 'Brak terminu';
+        : 'No deadline';
 
-    const isDone = task.status === 'done';
+    const isCompleted = task.status === 'completed';
 
     return (
-        <div className="task-card" style={isDone ? { opacity: 0.6 } : {}}>
-            <p className="task-title" style={isDone ? { textDecoration: 'line-through' } : {}}>
-                {task.name}
+        <div className={`task-card ${isCompleted ? 'completed' : ''}`}>
+            <div className="task-header">
+                <h3 className="task-title">
+                    {task.title}
+                </h3>
+            </div>
+
+            <p className="task-desc">
+                {task.description || 'No description'}
             </p>
 
-            <p className="task-desc">{task.description || 'Project node.js'}</p>
-            <p className="task-desc">Deadline: {formattedDate}</p>
+            <p className="task-date">
+                Deadline: {formattedDate}
+            </p>
 
             <div className="task-actions">
                 <button
-                    className="complete-btn"
-                    onClick={() => onToggleStatus(task.id, task.status)}
+                    className="btn-action btn-toggle"
+                    onClick={() => onToggleStatus(task)}
+                    title={isCompleted ? "Oznacz jako do zrobienia" : "Oznacz jako wykonane"}
                 >
                     ✔
                 </button>
+
                 <button
-                    className="delete-btn"
-                    onClick={() => onDelete(task.id)}
+                    className="btn-action btn-edit"
+                    onClick={onEdit}
+                    title="Edytuj"
+                >
+                    ✎
+                </button>
+
+                <button
+                    className="btn-action btn-delete"
+                    onClick={onDelete}
+                    title="Usuń"
                 >
                     ✕
                 </button>

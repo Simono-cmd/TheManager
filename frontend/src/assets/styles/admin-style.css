@@ -1,264 +1,172 @@
-header {
+/* src/assets/styles/admin-style.css */
+
+/* --- HEADER I TOOLBAR --- */
+.admin-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #393838;
-    color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-}
-
-header #title-container {
-    display: flex;
-    align-items: center;
-}
-
-header #logo {
-    max-height: 4em;
-    max-width: 4em;
-    margin: 0.5em;
-}
-
-header #title {
-    color: #ffffff;
-    font-family: Garamond, serif;
-    font-weight: bold;
-    font-size: 2em;
-    margin-left: 0.5em;
-}
-
-header #profile-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-right: 1em;
-}
-
-header .profile-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-right: 2em;
-}
-
-header .dropdown {
-    right: 0;
-    position: absolute;
-    top: 3.4em;
+    margin-bottom: 20px;
     background: white;
-    color: black;
-    width: 10em;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    font-size: 14px;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.4s;
-    font-family: Garamond, serif;
-    font-weight: bold;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-header .profile-wrapper:hover .dropdown {
-    opacity: 1;
-    visibility: visible;
-}
-
-header .dropdown ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-}
-
-header .dropdown ul li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-header .dropdown ul li:hover {
-    background: #dfd9d9;
-}
-
-body {
-    height: 100%;
+.admin-title {
     margin: 0;
-    padding: 0;
-}
-
-#content-wrapper {
-    display: flex;
-    flex-direction: column;
     font-family: Garamond, serif;
-    background-color: #272626;
-    padding: 8em 5em 1em 5em;
+    font-size: 1.8rem;
+    color: #333;
 }
 
-.profile-section {
-    background: #535252;
-    border-radius: 2em;
-    padding: 1em 1em 1em 1em;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
-    margin-bottom: 2em;
+.admin-toolbar {
+    display: flex;
+    gap: 15px;
 }
 
-.table-wrapper {
-    max-height: 18em;
-    overflow-y: auto;
+.admin-input, .admin-select {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 
-.profile-section h2 {
-    font-size: 1.5em;
-    margin: 0 0 10px 0;
-    padding-bottom: 0.2em;
+.admin-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+/* Specyficzny przycisk dodawania */
+.admin-toolbar .btn-add {
+    background-color: #4CAF50;
     color: white;
-    font-weight: lighter;
+}
+.admin-toolbar .btn-add:hover {
+    background-color: #45a049;
 }
 
-.profile-table {
+/* --- GŁÓWNY KONTENER --- */
+.admin-container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100%;
+}
+
+.admin-table-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* --- TABELA ADMINA --- */
+.admin-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.admin-table th {
+    background: #f4f4f4;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #ddd;
+}
+
+.admin-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+}
+
+.admin-table tr:hover { background-color: #f9f9f9; }
+
+/* --- AKCJE W TABELI (NAPRAWA KONFLIKTU) --- */
+/* Dodajemy .admin-table przed klasami przycisków.
+   Dzięki temu te kolory zadziałają TYLKO wewnątrz tabeli admina,
+   a nie na TaskCard w Dashboardzie. */
+
+.admin-table .action-btn {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.admin-table .btn-details { background-color: #2196F3; } /* Niebieski */
+.admin-table .btn-edit { background-color: #FF9800; }    /* Pomarańczowy */
+.admin-table .btn-delete { background-color: #f44336; }  /* Czerwony */
+
+/* --- MODAL W ADMINIE --- */
+.details-section h3 {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    color: #444;
+}
+
+.mini-table {
+    width: 100%;
+    font-size: 0.9rem;
+    border: 1px solid #eee;
     margin-top: 10px;
 }
+.mini-table th { background: #fafafa; padding: 8px; text-align: left;}
+.mini-table td { padding: 8px; border-top: 1px solid #eee; }
 
-.profile-table th {
-    background: #1867a8;
-    color: white;
-    padding: 12px;
-    font-size: 1.1em;
-    text-align: left;
-}
-
-.profile-table td {
-    padding: 12px;
-    border-bottom: 1px solid rgba(35, 38, 41, 0.14);
-    border-right: 1px solid rgba(35, 38, 41, 0.14);
-    background: #ffffff;
-}
-
-.profile-table tr:hover td {
-    background: #ededed;
-}
-
-
-.profile-table th:first-child {
-    border-top-left-radius: 1em;
-}
-
-.profile-table th:last-child {
-    border-top-right-radius: 1em;
-}
-
-.profile-table tr:last-child td:first-child {
-    border-bottom-left-radius: 1em;
-}
-
-.profile-table tr:last-child td:last-child {
-    border-bottom-right-radius: 1em;
-}
-
-.profile-table tr:first-child td:first-child {
-    border-top-left-radius: 1em;
-}
-
-.profile-table tr:first-child td:last-child {
-    border-top-right-radius: 1em;
-}
-
-.profile-table td:last-child {
-    white-space: nowrap;
-    overflow: visible;
-    padding: 6px 12px;
-}
-
-.profile-table td:last-child {
-    white-space: nowrap;
-    padding: 6px 12px;
-    background: #ffffff;
-}
-
-.actions {
-    display: flex;
-    gap: 0.5em;
-    justify-content: center;
-    align-items: center;
-}
-
-
-.actions button {
-    display: flex;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 3px;
-    border-radius: 2em;
-    transition: 0.4s;
-}
-
-.actions .details-btn {
-    padding: 6px 12px;
-    font-family: Garamond, serif;
-    background: #1866a7;
-    color: white;
-}
-
-.actions .details-btn:hover {
-    background: #2486d8;
-}
-
-.actions .edit-btn:hover {
-    background: rgba(0, 255, 34, 0.68);
-}
-
-.actions .delete-btn:hover {
-    background: rgba(255, 0, 0, 0.55);
-}
-
-.actions .icon {
-    width: 1.5em;
-    aspect-ratio: 1/1;
-}
-
-.table-title{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    border-bottom: 2px solid #474646;
-    gap: 0.2em;
-}
-
-.table-title div{
-  margin-left: 10em;
-}
-
-.table-title input
-{
-    background-color: #3a3838;
-    border: none;
-    width: 9em;
-    border-radius: 1em;
-    color: white;
-    padding: 0.5em 1em 0.5em 1em;
-    margin-bottom: 0.2em;
-}
-
-.table-title button
-{
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+    font-size: 0.9rem;
     text-align: center;
-    background-color: #3a3838;
-    border: none;
-    width: 6em;
-    border-radius: 1em;
+}
+
+/* Style przycisków w modalu (Uniwersalne - te mogą zostać wspólne) */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.danger-btn {
+    background-color: #f44336;
     color: white;
-    padding: 0.5em 1em 0.5em 1em;
-    transition: 0.4s;
-    margin-bottom: 0.2em;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
-.table-title button:hover{
-    background-color: #1866a7;
+.danger-btn:hover {
+    background-color: #d32f2f;
 }
 
+.secondary-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background-color: #d5d5d5;
+}

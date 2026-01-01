@@ -1,97 +1,112 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/index-style.css';
+import '../assets/styles/index-style.css'; // Zmieniłem nazwę pliku dla porządku
 
 function MainPage() {
     return (
-        <div className="landing-page">
-            <header>
-                <div id="title-container">
-                    <img src="../assets/media/logo.png" alt="logo" id="title-picture" />
-                    <div id="title">TheManager</div>
+        <div className="landing-page-wrapper">
+            <header className="landing-header">
+                <div className="landing-title-container">
+                    {/* Zakładając, że folder media jest w folderze public: */}
+                    <img src="/media/logo.png" alt="logo" className="landing-logo" />
+                    <div className="landing-app-name">TheManager</div>
                 </div>
 
-                <div id="login-buttons">
+                <div className="landing-auth-buttons">
                     <Link to="/login">
-                        <button>Zaloguj się</button>
+                        <button className="btn-login">Zaloguj się</button>
                     </Link>
                     <Link to="/register">
-                        <button>Zarejestruj się</button>
+                        <button className="btn-register">Zarejestruj się</button>
                     </Link>
                 </div>
             </header>
 
-            <div className="main-grid">
-                <div>
-                    <h1>Efektywne przydzielanie zadań</h1>
-                    <h3>TheManager pozwala w prosty sposób przypisywać zadania pracownikom, śledzić ich postępy i priorytety. Dzięki przejrzystemu interfejsowi każdy członek zespołu dokładnie wie, co ma robić i w jakim czasie. Unikasz chaosu i nadmiernego obciążenia pracowników – wszystkie zadania są w jednym miejscu, dostępne w czasie rzeczywistym.</h3>
-                </div>
-                <img className="main-img" src="https://media.istockphoto.com/id/1254287193/vector/illustration-of-two-business-colleagues-analyzing-financial-data.jpg?s=612x612&w=0&k=20&c=x4AoOLwM1JOMSDj_t2o_ezIFJe4jwvWZfEWFK3LbBCw=" alt="picture1" />
-            </div>
+            <main className="landing-content">
+                {/* Sekcja 1: Tekst - Obraz */}
+                <section className="landing-section">
+                    <div className="text-content">
+                        <h1>Efektywne przydzielanie zadań</h1>
+                        <p className="description">
+                            TheManager pozwala w prosty sposób przypisywać zadania pracownikom, śledzić ich postępy i priorytety.
 
-            <div className="main-grid">
-                <img className="main-img" src="https://media.istockphoto.com/id/1280280320/vector/financial-statements-analysis-implementing-business-solutions-scaling-your-business.jpg?s=612x612&w=0&k=20&c=FbmiznzPGeBCzO34OENRwT0HvcPA0CHEauZc2jmbhzg=" alt="picture2" />
-                <div>
-                    <h1>Płynny i wydajny proces pracy</h1>
-                    <h3>Aplikacja analizuje przepływ pracy w Twojej firmie i sugeruje optymalne kolejności działań. Możesz identyfikować obszary wymagające dodatkowego wsparcia, skracać czas oczekiwania między zadaniami i automatyzować powtarzalne procesy. Dzięki temu Twój zespół pracuje szybciej i sprawniej, a projekty realizowane są terminowo.</h3>
-                </div>
-            </div>
+                            Dzięki przejrzystemu interfejsowi każdy członek zespołu dokładnie wie, co ma robić i w jakim czasie.
+                            Unikasz chaosu i nadmiernego obciążenia pracowników – wszystkie zadania są w jednym miejscu.
+                        </p>
+                    </div>
+                    <div className="image-content">
+                        <img src="https://media.istockphoto.com/id/1254287193/vector/illustration-of-two-business-colleagues-analyzing-financial-data.jpg?s=612x612&w=0&k=20&c=x4AoOLwM1JOMSDj_t2o_ezIFJe4jwvWZfEWFK3LbBCw=" alt="Colleagues analyzing data" />
+                    </div>
+                </section>
 
-            <div className="main-grid">
-                <div>
-                    <h1>Monitoruj postępy i podejmuj lepsze decyzje</h1>
-                    <h3>TheManager umożliwia generowanie raportów na podstawie aktualnych danych – widzisz, kto wykonuje swoje zadania efektywnie, a gdzie proces wymaga wsparcia. Dzięki wizualizacjom i szczegółowym statystykom łatwiej planować zasoby i podejmować decyzje strategiczne, zwiększając produktywność całego zespołu.</h3>
-                </div>
-                <img className="main-img" src="https://media.istockphoto.com/id/1192104785/vector/business-data-analysis-data-research-strategic-planning-and-marketing.jpg?s=612x612&w=0&k=20&c=FqCUQXQGwqwSdpfRLHcxcvgjy-QhLpLTK5JZNa2DQIo=" alt="picture3" />
-            </div>
+                {/* Sekcja 2: Obraz - Tekst (Odwrócona kolejność na Desktopie) */}
+                <section className="landing-section reverse-layout">
+                    <div className="image-content">
+                        <img src="https://media.istockphoto.com/id/1280280320/vector/financial-statements-analysis-implementing-business-solutions-scaling-your-business.jpg?s=612x612&w=0&k=20&c=FbmiznzPGeBCzO34OENRwT0HvcPA0CHEauZc2jmbhzg=" alt="Business solutions" />
+                    </div>
+                    <div className="text-content">
+                        <h1>Płynny i wydajny proces pracy</h1>
+                        <p className="description">
+                            Aplikacja analizuje przepływ pracy w Twojej firmie i sugeruje optymalne kolejności działań.
+                            Możesz identyfikować obszary wymagające dodatkowego wsparcia i automatyzować powtarzalne procesy.
+                            Dzięki temu Twój zespół pracuje szybciej i sprawniej.
+                        </p>
+                    </div>
+                </section>
 
-            <div className="summary-grid">
-                <p> Dlaczego warto wybrać TheManager?</p>
-                <div>
-                    <ol>
-                        <li>Znajdź zadanie, które wymaga wykonania</li>
-                        <li>Przypisz zadanie pracownikowi</li>
-                        <li>Śledź na bieżąco proces realizacji</li>
-                        <li>Zarządzanie prostsze niż kiedykolwiek!</li>
-                    </ol>
-                </div>
+                {/* Sekcja 3: Tekst - Obraz */}
+                <section className="landing-section">
+                    <div className="text-content">
+                        <h1>Monitoruj postępy i podejmuj lepsze decyzje</h1>
+                        <p className="description">
+                            TheManager umożliwia generowanie raportów na podstawie aktualnych danych.
 
-                <div>
-                    <table id="summary-table">
-                        <tbody>
-                        <tr>
-                            <td>Prosty</td>
-                            <td>Elastyczny</td>
-                        </tr>
-                        <tr>
-                            <td>Uniwersalny</td>
-                            <td>Skalowalny</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            Widzisz, kto wykonuje swoje zadania efektywnie, a gdzie proces wymaga wsparcia.
+                            Dzięki wizualizacjom i szczegółowym statystykom łatwiej planować zasoby i podejmować decyzje strategiczne.
+                        </p>
+                    </div>
+                    <div className="image-content">
+                        <img src="https://media.istockphoto.com/id/1192104785/vector/business-data-analysis-data-research-strategic-planning-and-marketing.jpg?s=612x612&w=0&k=20&c=FqCUQXQGwqwSdpfRLHcxcvgjy-QhLpLTK5JZNa2DQIo=" alt="Data analysis" />
+                    </div>
+                </section>
 
-                <div>
-                    <ul>
-                        <li>Przypisywanie zadań pracownikom jednym kliknięciem</li>
-                        <li>Ustalanie priorytetów i terminów</li>
-                        <li>Śledzenie statusu wykonania</li>
-                        <li>Proste planowanie - efektywna praca</li>
-                        <li>Historia zadań dla każdego pracownika</li>
-                    </ul>
-                </div>
-            </div>
+                {/* Sekcja Podsumowania */}
+                <section className="summary-section">
+                    <h2 className="summary-title">Dlaczego warto wybrać TheManager?</h2>
 
-            <footer>
-                <div id="newsletter-container">
-                    <p className="footer-text"> Zapisz się do naszego newslettera!</p>
-                    <form className="newsletter-form" action="#">
-                        <label htmlFor="email"></label>
-                        <input type="email" id="email" placeholder="example@email.com" />
-                        <button type="submit">Zapisz się!</button>
-                    </form>
-                </div>
-            </footer>
+                    <div className="summary-grid">
+                        <div className="summary-card">
+                            <h3>Kroki do sukcesu</h3>
+                            <ol>
+                                <li>Znajdź zadanie</li>
+                                <li>Przypisz pracownika</li>
+                                <li>Śledź postępy</li>
+                                <li>Osiągaj cele</li>
+                            </ol>
+                        </div>
+
+                        <div className="summary-card">
+                            <h3>Cechy</h3>
+                            <table className="summary-table">
+                                <tbody>
+                                <tr><td>Prosty</td><td>Elastyczny</td></tr>
+                                <tr><td>Uniwersalny</td><td>Skalowalny</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="summary-card">
+                            <h3>Korzyści</h3>
+                            <ul>
+                                <li>Szybkie przypisywanie</li>
+                                <li>Jasne priorytety</li>
+                                <li>Historia zadań</li>
+                                <li>Efektywna praca</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </main>
         </div>
     );
 }

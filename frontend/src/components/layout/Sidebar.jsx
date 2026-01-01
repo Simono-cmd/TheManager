@@ -1,96 +1,185 @@
 import { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { getBoards, createBoard, deleteBoard } from '../../api/boards.api'; // Dostosuj ścieżkę do api jeśli trzeba
+import { getAllBoards, createBoard, deleteBoard, updateBoard } from '../../api/boards.api';
 import { useAuth } from '../../hooks/useAuth';
+import Modal from '../common/Modal';
 
-const Sidebar = () => {
+const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
     const [boards, setBoards] = useState([]);
     const { user } = useAuth();
-    const navigate = useNavigate();
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalType, setModalType] = useState('create'); // 'create' | 'edit' | 'delete'
+    const [targetBoard, setTargetBoard] = useState(null);
+    const [boardNameInput, setBoardNameInput] = useState('');
 
     useEffect(() => {
         refreshBoards();
-    }, [user]); // Dodajemy zależność user
+    }, [user]);
 
     const refreshBoards = () => {
-        // --- LOGIKA DLA GOŚCIA ---
         if (user?.role === 'guest') {
             const localBoards = JSON.parse(localStorage.getItem('guest_boards') || '[]');
             setBoards(localBoards);
-        }
-        // --- LOGIKA DLA ZALOGOWANEGO ---
-        else {
-            getBoards().then(setBoards).catch(console.error);
-        }
-    };
-
-    const handleAddBoard = async () => {
-        const name = prompt("Podaj nazwę nowej tablicy:");
-        if (!name) return;
-
-        if (user?.role === 'guest') {
-            // Tworzymy tablicę lokalnie
-            const newBoard = { id: Date.now(), name: name }; // Generujemy sztuczne ID
-            const currentBoards = JSON.parse(localStorage.getItem('guest_boards') || '[]');
-            const updatedBoards = [...currentBoards, newBoard];
-
-            localStorage.setItem('guest_boards', JSON.stringify(updatedBoards));
-            refreshBoards();
         } else {
-            // Tworzymy tablicę w API
-            await createBoard({ name, ownerId: user.id });
-            refreshBoards();
+            getAllBoards().then(setBoards).catch(console.error);
         }
     };
 
-    const handleDeleteBoard = async (e, id) => {
+
+    const openCreateModal = () => {
+        setModalType('create');
+        setBoardNameInput('');
+        setTargetBoard(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (e, board) => {
+        e.stopPropagation();
+        setModalType('edit');
+        setBoardNameInput(board.name);
+        setTargetBoard(board);
+        setIsModalOpen(true);
+    };
+
+    const openDeleteModal = (e, board) => {
+        e.stopPropagation();
+        setModalType('delete');
+        setTargetBoard(board);
+        setIsModalOpen(true);
+    };
+
+    // --- LOGIKA ZATWIERDZANIA (SUBMIT) ---
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if(!window.confirm("Usunąć tablicę?")) return;
 
-        if (user?.role === 'guest') {
-            // Usuwamy lokalnie
-            const currentBoards = JSON.parse(localStorage.getItem('guest_boards') || '[]');
-            const updatedBoards = currentBoards.filter(b => b.id !== id);
-            localStorage.setItem('guest_boards', JSON.stringify(updatedBoards));
-            refreshBoards();
-            navigate('/dashboard');
-        } else {
-            // Usuwamy z API
-            await deleteBoard(id);
-            refreshBoards();
-            navigate('/dashboard');
+        // 1. OBSŁUGA TWORZENIA
+        if (modalType === 'create') {
+            if (!boardNameInput.trim()) return;
+
+            if (user?.role === 'guest') {
+                const newBoard = { id: Date.now(), name: boardNameInput };
+                const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
+                localStorage.setItem('guest_boards', JSON.stringify([...current, newBoard]));
+            } else {
+                await createBoard({ name: boardNameInput, ownerId: user.id });
+            }
         }
+
+        // 2. OBSŁUGA EDYCJI
+        else if (modalType === 'edit' && targetBoard) {
+            if (!boardNameInput.trim()) return;
+
+            if (user?.role === 'guest') {
+                const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
+                const updated = current.map(b => b.id === targetBoard.id ? { ...b, name: boardNameInput } : b);
+                localStorage.setItem('guest_boards', JSON.stringify(updated));
+            } else {
+                await updateBoard(targetBoard.id, { name: boardNameInput });
+            }
+        }
+
+        // 3. OBSŁUGA USUWANIA
+        else if (modalType === 'delete' && targetBoard) {
+            if (user?.role === 'guest') {
+                const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
+                const updated = current.filter(b => b.id !== targetBoard.id);
+                localStorage.setItem('guest_boards', JSON.stringify(updated));
+                // Jeśli usunięto aktywną tablicę, można obsłużyć odznaczenie w rodzicu (opcjonalnie)
+            } else {
+                await deleteBoard(targetBoard.id);
+            }
+        }
+
+        refreshBoards();
+        setIsModalOpen(false);
+    };
+
+    const getModalTitle = () => {
+        if (modalType === 'create') return "New Board";
+        if (modalType === 'edit') return "Edit Board";
+        if (modalType === 'delete') return "Delete Board";
     };
 
     return (
-        <div className="sidebar">
+        <div className="sidebar" style={{ height: '100%', borderRight: '1px solid #ccc' }}>
             <div id="sidebar-top">
                 <p>Your boards</p>
-                <button className="add-btn" onClick={handleAddBoard}>+</button>
+                <button className="add-btn" onClick={openCreateModal}>+</button>
             </div>
 
             <ul className="board-list">
                 {boards.map(board => (
-                    <li className="board-item" key={board.id}>
-                        <NavLink
-                            to={`/dashboard/board/${board.id}`}
-                            className={({ isActive }) => isActive ? "board-name active" : "board-name"} // Tu można dopracować style active
-                            style={{ textDecoration: 'none', color: 'inherit', display: 'flex', width: '100%', justifyContent: 'space-between' }}
+                    <li key={board.id} className="board-item">
+                        <div
+                            className={`board-name ${selectedBoardId === board.id ? 'active' : ''}`}
+                            onClick={() => onSelectBoard(board)}
+                            style={{ cursor: 'pointer', width: '100%', padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                         >
-                            <span>{board.name}</span>
+                            <span style={{flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                                {board.name}
+                            </span>
 
-                            <div className="actions">
-                                <button className="edit-btn">
-                                    <img src="../../assets/media/edit.png" alt="edit" className="icon"/>
+                            <div className="actions" style={{display: 'flex', gap: '5px'}}>
+                                <button className="edit-btn" onClick={(e) => openEditModal(e, board)} title="Edytuj">
+                                    <img src="/media/edit.png" alt="edit" className="icon" style={{width: '16px', height: '16px'}}/>
                                 </button>
-                                <button className="delete-btn" onClick={(e) => handleDeleteBoard(e, board.id)}>
-                                    <img src="../../assets/media/delete.png" alt="delete" className="icon"/>
+
+                                <button className="delete-btn" onClick={(e) => openDeleteModal(e, board)} title="Usuń">
+                                    <img src="/media/delete.png" alt="delete" className="icon" style={{width: '16px', height: '16px'}}/>
                                 </button>
                             </div>
-                        </NavLink>
+                        </div>
                     </li>
                 ))}
             </ul>
+
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={getModalTitle()}
+            >
+                <form onSubmit={handleSubmit}>
+
+                    {(modalType === 'create' || modalType === 'edit') && (
+                        <div style={{ marginBottom: '15px' }}>
+                            <label style={{ display: 'block', marginBottom: '5px' }}>Nazwa tablicy:</label>
+                            <input
+                                type="text"
+                                value={boardNameInput}
+                                onChange={(e) => setBoardNameInput(e.target.value)}
+                                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                                autoFocus
+                            />
+                        </div>
+                    )}
+
+                    {modalType === 'delete' && (
+                        <div style={{ marginBottom: '15px', color: 'black' }}>
+                            Do you want to delete board <strong>{targetBoard?.name}</strong>?
+                            <br/>This operation cannot be undone!
+                        </div>
+                    )}
+
+                    <div className="modal-actions">
+                        <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+
+                        <button
+                            type="submit"
+                            style={{
+                                backgroundColor: modalType === 'delete' ? '#d32f2f' : '#4CAF50',
+                                color: 'white',
+                                border: 'none',
+                                padding: '8px 16px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {modalType === 'create' ? 'Create' : modalType === 'edit' ? 'Save' : 'Delete'}
+                        </button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

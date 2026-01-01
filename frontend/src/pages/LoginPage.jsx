@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { loginUser } from '../api/auth.api.js';
 import "../assets/styles/login-style.css";
 
 const LoginPage = () => {
-    // Stan formularza
     const [formData, setFormData] = useState({ username: '', password: '' });
-    const [showPassword, setShowPassword] = useState(false); // Stan dla oka
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
 
     const { login, loginAsGuest } = useAuth();
@@ -18,7 +17,10 @@ const LoginPage = () => {
         navigate('/dashboard');
     };
 
-    // Obsługa wpisywania
+    const handleRegister = () => {
+        navigate('/register');
+    };
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -26,12 +28,11 @@ const LoginPage = () => {
         });
     };
 
-    // Przełączanie widoczności hasła
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    // Wysyłanie formularza
+    //obsługa logowania
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -40,32 +41,27 @@ const LoginPage = () => {
             const response = await loginUser(formData.username, formData.password);
 
             if (response.token && response.user) {
-                login(response.user, response.token);
-                // Przekierowanie w zależności od roli
-                if (response.user.role === 'admin') {
-                    navigate('/admin/boards');
-                } else {
-                    navigate('/dashboard');
-                }
+                login(response.user, response.token); //login z useAuth
+                navigate('/dashboard');
             } else {
-                setError("Błąd serwera (brak tokena).");
+                setError("ERROR: no user token");
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Błąd logowania');
+            setError(err.response?.data?.message || 'Error logging in');
         }
     };
 
     return (
-        <div className="login">
+        <div className="login-page-wrapper">
             <div className="login-container">
                 <div className="header">
-                    <img src="../assets/media/logo.png" alt="logo" className="login-logo" />
-                    <p className="app-title">TheManager</p><br/>
+                    <img src="/media/logo.png" alt="logo" className="login-logo" />
+                    <p className="app-title">TheManager</p>
                 </div>
 
-                <p className="login-text">Zaloguj się do aplikacji</p><br/>
+                <p className="login-text">Login</p>
 
-                {error && <p style={{color: 'red', textAlign: 'center', marginBottom: '10px'}}>{error}</p>}
+                {error && <p className="error-message">{error}</p>}
 
                 <form className="login-form" onSubmit={handleSubmit}>
                     <label className="login-form-text" htmlFor="username"> Username: </label>
@@ -76,12 +72,12 @@ const LoginPage = () => {
                         value={formData.username}
                         onChange={handleChange}
                         required
-                    /><br/>
+                    />
 
                     <label className="login-form-text" htmlFor="password"> Password: </label>
                     <div className="password-container">
                         <input
-                            type={showPassword ? "text" : "password"} // Tu dzieje się magia oka
+                            type={showPassword ? "text" : "password"}
                             id="password"
                             name="password"
                             value={formData.password}
@@ -92,25 +88,21 @@ const LoginPage = () => {
                             className="toggle-password"
                             id="togglePassword"
                             onClick={togglePasswordVisibility}
-                            style={{cursor: 'pointer'}} // Dodajemy kursor rączki
                         >
-                            {showPassword ? '🙈' : '👁'}
+                            👁
                         </span>
                     </div>
-                    <button type="submit">Zaloguj się</button>
+                    <button type="submit">Login</button>
                 </form>
 
-                <button
-                    className="login-guest"
-                    onClick={handleGuestLogin}
-                    style={{ marginTop: '10px', width: '100%', cursor: 'pointer' }}
-                >
-                    Zaloguj się jako gość
-                </button>
+                <div className="register-container">
+                    <button className="btn-guest" onClick={handleGuestLogin}>
+                        Continue as guest
+                    </button>
 
-
-                <div style={{textAlign: 'center', marginTop: '15px'}}>
-                    <Link to="/register" style={{textDecoration: 'none', color: '#333'}}>Nie masz konta? Zarejestruj się</Link>
+                    <button className="btn-guest" onClick={handleRegister}>
+                        Register
+                    </button>
                 </div>
             </div>
         </div>

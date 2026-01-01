@@ -18,7 +18,7 @@ module.exports=(sequelize) => {
                 allowNull: true
             },
             status:{
-                type: DataTypes.ENUM('to do', 'in progress', 'completed', 'failed'),
+                type: DataTypes.ENUM('to do', 'completed'),
                 defaultValue: 'to do'
             },
             boardId: {

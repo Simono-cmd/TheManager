@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/auth.api.js';
-import "../assets/styles/login-style.css"; // Używamy tego samego stylu co login
+import "../assets/styles/login-style.css";
+import {useAuth} from "../hooks/useAuth.jsx";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-
+    const {loginAsGuest} = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -26,6 +27,15 @@ const RegisterPage = () => {
         setShowPassword(!showPassword);
     };
 
+    const handleLoginRedirect = () => {
+        navigate('/login');
+    };
+
+    const handleGuestRedirect = () => {
+        loginAsGuest();
+        navigate('/dashboard');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -37,44 +47,49 @@ const RegisterPage = () => {
                 navigate('/login');
             }, 2000);
         } catch (err) {
-            setError(err.response?.data?.message || 'Błąd rejestracji');
+            setError(err.response?.data?.message || 'Register error');
         }
     };
 
     return (
-        <div className="login">
+        <div className="login-page-wrapper">
             <div className="login-container">
                 <div className="header">
-                    <img src="../assets/media/logo.png" alt="logo" className="login-logo" />
-                    <p className="app-title">TheManager</p><br/>
+                    <img src="/media/logo.png" alt="logo" className="login-logo" />
+                    <p className="app-title">TheManager</p>
                 </div>
 
-                <p className="login-text">Utwórz nowe konto</p><br/>
+                <p className="login-text">Create Account</p>
 
-                {error && <p style={{color: 'red', textAlign: 'center', marginBottom: '10px'}}>{error}</p>}
-                {success && <p style={{color: 'green', textAlign: 'center', marginBottom: '10px'}}>Konto utworzone! Przekierowywanie...</p>}
+                {error && <p className="error-message">{error}</p>}
+
+                {success && (
+                    <p style={{
+                        color: '#4caf50',
+                        textAlign: 'center',
+                        marginBottom: '1em',
+                        fontWeight: 'bold'}}>
+                        Account created! Redirecting...
+                    </p>
+                )}
 
                 {!success && (
                     <form className="login-form" onSubmit={handleSubmit}>
                         <label className="login-form-text" htmlFor="username"> Username: </label>
-                        <input
-                            type="text"
+                        <input type="text"
                             id="username"
                             name="username"
                             value={formData.username}
                             onChange={handleChange}
-                            required
-                        /><br/>
+                            required/>
 
                         <label className="login-form-text" htmlFor="email"> Email: </label>
-                        <input
-                            type="email"
+                        <input type="email"
                             id="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            required
-                        /><br/>
+                            required/>
 
                         <label className="login-form-text" htmlFor="password"> Password: </label>
                         <div className="password-container">
@@ -84,22 +99,25 @@ const RegisterPage = () => {
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                required
-                            />
+                                required/>
                             <span
                                 className="toggle-password"
-                                onClick={togglePasswordVisibility}
-                                style={{cursor: 'pointer'}}
-                            >
-                                {showPassword ? '🙈' : '👁'}
+                                onClick={togglePasswordVisibility}>
+                                👁
                             </span>
                         </div>
-                        <button type="submit">Zarejestruj się</button>
+                        <button type="submit">Register</button>
                     </form>
                 )}
 
-                <div style={{textAlign: 'center', marginTop: '15px'}}>
-                    <Link to="/login" style={{textDecoration: 'none', color: '#333'}}>Masz już konto? Zaloguj się</Link>
+                <div className="register-container">
+                    <button className="btn-guest" onClick={handleLoginRedirect}>
+                        Login instead
+                    </button>
+
+                    <button className="btn-guest" onClick={handleGuestRedirect}>
+                        Continue as guest
+                    </button>
                 </div>
             </div>
         </div>

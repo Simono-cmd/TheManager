@@ -9,10 +9,26 @@ export const AuthProvider = ({children}) => {
 
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
+        const token = localStorage.getItem('token');
 
-        if(storedUser && storedToken){
-            setUser(JSON.parse(storedUser));
+        console.log("Start useEffect. StoredUser:", storedUser); // LOG 1
+
+        if (storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                console.log("Parsed User:", parsedUser);
+                console.log("Token:", token);
+
+                if (token || parsedUser.role === 'guest') {
+                    console.log("Warunek spełniony! Przywracam sesję.");
+                    setUser(parsedUser);
+                } else {
+                    console.log("Warunek NIE spełniony. Brakuje tokena lub roli.");
+                }
+            } catch (e) {
+                console.error("Błąd parsowania JSON:", e);
+                localStorage.removeItem('user');
+            }
         }
         setLoading(false);
     }, []);
@@ -22,6 +38,9 @@ export const AuthProvider = ({children}) => {
         localStorage.removeItem('user');
         setUser(null);
         window.location.href='/';
+
+        localStorage.removeItem('guest_boards');
+        localStorage.removeItem('guest_tasks');
     };
 
     const login = (userData, token) =>{

@@ -1,192 +1,118 @@
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #393838;
-    color: white;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-}
 
-header #title-container {
-    display: flex;
-    align-items: center;
-}
-
-header #logo {
-    max-height: 4em;
-    max-width: 4em;
-    margin: 0.5em;
-}
-
-header #title {
-    color: #ffffff;
-    font-family: Garamond, serif;
-    font-weight: bold;
-    font-size: 2em;
-    margin-left: 0.5em;
-}
-
-header #profile-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    margin-right: 1em;
-}
-
-header .profile-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-right: 2em;
-}
-
-header .dropdown {
-    right: 0;
-    position: absolute;
-    top: 3.4em;
-    background: white;
-    color: black;
-    width: 10em;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    font-size: 14px;
-    opacity: 0;
-    visibility: hidden;
-    transition: 0.4s;
-    font-family: Garamond, serif;
-    font-weight: bold;
-}
-
-header .profile-wrapper:hover .dropdown {
-    opacity: 1;
-    visibility: visible;
-}
-
-header .dropdown ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-}
-
-header .dropdown ul li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-}
-
-header .dropdown ul li:hover {
-    background: #dfd9d9;
-}
-
-body {
+.profile-wrapper-scroll {
     height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-#content-wrapper {
-    display: flex;
-    flex-direction: column;
-    font-family: Garamond, serif;
-    background-color: #272626;
-    padding: 8em 5em 1em 5em;
-}
-
-.profile-section {
-    background: #535252;
-    border-radius: 2em;
-    padding: 1em 1em 1em 1em;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
-    margin-bottom: 2em;
-}
-
-.table-wrapper {
-    max-height: 18em;
+    width: 100%;
     overflow-y: auto;
 }
 
-.profile-table {
+.profile-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.profile-title {
+    font-family: Garamond, serif;
+    font-size: 2.2em;
+    color: #272727;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+/* --- Karty Sekcji --- */
+.profile-section {
+    background: white;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e1e1e1;
+}
+
+.section-header {
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+    font-size: 1.3rem;
+    color: #444;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+/* Kolorowe akcenty przy nagłówkach */
+.section-header.green-border { border-left: 5px solid #4CAF50; padding-left: 15px; }
+.section-header.blue-border { border-left: 5px solid #567dc2; padding-left: 15px; }
+
+/* --- Tabela Danych Użytkownika --- */
+.user-info-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-
-.profile-section h2 {
-    font-size: 1.5em;
-    margin: 0 0 10px 0;
-    border-bottom: 2px solid #474646;
-    padding-bottom: 0.2em;
-    color: white;
-    font-weight: lighter;
+.user-info-table td {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 1rem;
+    color: #333;
 }
 
-.profile-table {
+.user-info-table tr:last-child td { border-bottom: none; }
+
+.user-info-label {
+    font-weight: bold;
+    color: #555;
+    width: 200px;
+    background-color: #fafafa;
+}
+
+/* --- Tabela Zadań --- */
+.tasks-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
 
-.profile-table th {
-    background: #1867a8;
-    color: white;
-    padding: 12px;
-    font-size: 1.1em;
+.tasks-table th {
+    background-color: #f8f9fa;
+    color: #666;
+    font-weight: bold;
     text-align: left;
+    padding: 12px 15px;
+    border-bottom: 2px solid #e9ecef;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.profile-table td {
-    padding: 12px;
-    border-bottom: 1px solid rgba(35, 38, 41, 0.14);
-    border-right: 1px solid rgba(35, 38, 41, 0.14);
-    background: #ffffff;
+.tasks-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    font-size: 0.95rem;
 }
 
-.profile-table tr:hover td {
-    background: #ededed;
+.tasks-table tr:hover { background-color: #fbfbfb; }
+
+/* --- Status Badges --- */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
 }
 
+.status-todo { background-color: #e3f2fd; color: #1c4b75; }
+.status-completed { background-color: #e8f5e9; color: #2e7d32; }
 
-.profile-table th:first-child {
-    border-top-left-radius: 1em;
+.empty-message {
+    color: #888;
+    font-style: italic;
+    padding: 15px;
+    text-align: center;
+    background-color: #fafafa;
+    border-radius: 6px;
 }
-
-.profile-table th:last-child {
-    border-top-right-radius: 1em;
-}
-
-.profile-table tr:last-child td:first-child {
-    border-bottom-left-radius: 1em;
-}
-
-.profile-table tr:last-child td:last-child {
-    border-bottom-right-radius: 1em;
-}
-
-.profile-table tr:first-child td:first-child {
-    border-top-left-radius: 1em;
-}
-
-.profile-table tr:first-child td:last-child {
-    border-top-right-radius: 1em;
-}
-
-.details-btn {
-    padding: 6px 12px;
-    font-family: Garamond, serif;
-    border: none;
-    border-radius: 1em;
-    background: #1866a7;
-    color: white;
-    cursor: pointer;
-    transition: 0.4s;
-}
-
-.details-btn:hover {
-    background: #2486d8;
-}
-
