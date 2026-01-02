@@ -1,6 +1,4 @@
-/* src/assets/styles/task-card.css */
 
-/* --- GŁÓWNA KARTA --- */
 .task-card {
     padding: 15px;
     margin-bottom: 10px;
@@ -8,22 +6,17 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
     width: 220px;
-    /* Domyślny styl (nieukończone) */
-    border-left: 5px solid #ccc;
+    border-left: 5px solid #cccccc;
     background-color: white;
     opacity: 1;
-
-
 }
 
-/* Styl dla ukończonego zadania */
 .task-card.completed {
     border-left-color: #4CAF50;
     background-color: #e8f5e9;
     opacity: 0.8;
 }
 
-/* --- NAGŁÓWEK I TYTUŁ --- */
 .task-header {
     display: flex;
     justify-content: space-between;
@@ -33,14 +26,14 @@
 .task-title {
     margin: 0 0 10px 0;
     font-size: 1.1rem;
-    color: #333;
+    color: #333333;
     text-decoration: none;
     transition: color 0.3s;
-    white-space: nowrap;      /* Zakaz łamania linii */
-    overflow: hidden;         /* Ukryj to co wystaje */
-    text-overflow: ellipsis;  /* Dodaj trzy kropki */
-    display: block;           /* Ważne dla poprawnego działania overflow */
-    max-width: 100%;          /* Upewnij się, że nie przekracza rodzica */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
 }
 
 .task-card.completed .task-title {
@@ -48,20 +41,18 @@
     color: #2e7d32;
 }
 
-/* --- OPIS I DATA --- */
 .task-desc {
     font-size: 0.9rem;
-    color: #555;
+    color: #555555;
     margin-bottom: 10px;
 }
 
 .task-date {
     font-size: 0.8rem;
-    color: #888;
+    color: #8e8e88;
     margin-bottom: 15px;
 }
 
-/* --- PRZYCISKI AKCJI --- */
 .task-actions {
     display: flex;
     justify-content: flex-end;
@@ -76,7 +67,6 @@
     transition: background-color 0.2s;
 }
 
-/* Przycisk Toggle (Zrobione) */
 .btn-toggle {
     border: 1px solid #4CAF50;
     color: #4CAF50;
@@ -88,7 +78,6 @@
     color: white;
 }
 
-/* Przycisk Edycji */
 .btn-edit {
     border: 1px solid #2196F3;
     color: #2196F3;
@@ -98,7 +87,6 @@
     background-color: #e3f2fd;
 }
 
-/* Przycisk Usuwania */
 .btn-delete {
     border: 1px solid #cd0c0c;
     color: #e40d0d;

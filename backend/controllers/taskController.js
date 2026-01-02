@@ -6,12 +6,12 @@ async function createTask(req, res) {
         const { title, description, deadline, boardId, status } = req.body;
 
         if (!boardId) {
-            return res.status(400).json({ message: "Musisz podać ID tablicy (boardId)." });
+            return res.status(400).json({ message: "BoardID is required" });
         }
 
         const boardExists = await Board.findByPk(boardId);
         if (!boardExists) {
-            return res.status(404).json({ message: `Tablica o ID ${boardId} nie istnieje.` });
+            return res.status(404).json({ message: `Board with ID ${boardId} does not exist` });
         }
 
         const task = await Task.create({
@@ -31,13 +31,11 @@ async function createTask(req, res) {
         res.status(201).json(task);
 
     } catch (error) {
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-            return res.status(400).json({ message: "Podane ID tablicy jest nieprawidłowe." });
-        }
         res.status(400).json({ message: error.message });
     }
 }
 
+//for admin panel
 async function getAllTasks(req, res) {
     try {
         let { page, limit } = req.query;
@@ -86,16 +84,13 @@ async function updateTask(req, res) {
         if (req.body.boardId) {
             const boardExists = await Board.findByPk(req.body.boardId);
             if (!boardExists) {
-                return res.status(404).json({ message: `Tablica docelowa o ID ${req.body.boardId} nie istnieje.` });
+                return res.status(404).json({ message: `Board with ID ${req.body.boardId} does not exist` });
             }
         }
 
         await task.update(req.body);
         res.status(200).json(task);
     } catch (error) {
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-            return res.status(400).json({ message: "Podane ID tablicy jest nieprawidłowe." });
-        }
         res.status(400).json({ message: error.message });
     }
 }
@@ -111,11 +106,10 @@ async function deleteTask(req, res) {
     }
 }
 
+//for dashboard
 async function getTasksByBoard(req, res) {
     try {
         const { boardId } = req.params;
-        // Tutaj zazwyczaj NIE chcemy paginacji (kanban potrzebuje wszystkich),
-        // więc zostawiamy findAll
         const tasks = await Task.findAll({
             where: { boardId: boardId },
             order: [['createdAt', 'DESC']]

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { loginUser } from '../api/auth.api.js';
@@ -8,9 +8,12 @@ const LoginPage = () => {
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-
     const { login, loginAsGuest } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = "Login | TheManager";
+    }, []);
 
     const handleGuestLogin = () => {
         loginAsGuest();
@@ -38,10 +41,10 @@ const LoginPage = () => {
         setError('');
 
         try {
-            const response = await loginUser(formData.username, formData.password);
+            const response = await loginUser(formData.username, formData.password); //login przez api do backendu
 
             if (response.token && response.user) {
-                login(response.user, response.token); //login z useAuth
+                login(response.user, response.token); //odebrany login - zapisanie stanu authcontext
                 navigate('/dashboard');
             } else {
                 setError("ERROR: no user token");

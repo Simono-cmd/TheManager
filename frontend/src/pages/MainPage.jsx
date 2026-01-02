@@ -7,7 +7,6 @@ function MainPage() {
         <div className="landing-page-wrapper">
             <header className="landing-header">
                 <div className="landing-title-container">
-                    {/* Zakładając, że folder media jest w folderze public: */}
                     <img src="/media/logo.png" alt="logo" className="landing-logo" />
                     <div className="landing-app-name">TheManager</div>
                 </div>

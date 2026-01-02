@@ -1,32 +1,26 @@
 const bcrypt = require('bcryptjs');
 const { User, Board, Task, TaskMember } = require('../models');
 
-// Prosty i skuteczny Regex do walidacji emaila
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Tworzenie użytkownika (Admin Panel)
 async function createUser(req, res) {
     try {
         const { username, email, password, role } = req.body;
 
-        // 1. Walidacja: Czy pola są wypełnione?
         if (!username || !email || !password) {
-            return res.status(400).json({ message: "Wszystkie pola (username, email, password) są wymagane." });
+            return res.status(400).json({ message: "All fields required" });
         }
 
-        // 2. NOWOŚĆ: Walidacja formatu emaila
         if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: "Podany adres email ma nieprawidłowy format." });
+            return res.status(400).json({ message: "Incorrect email format" });
         }
 
-        // 3. Sprawdzenie duplikatów
         const existingEmail = await User.findOne({ where: { email } });
-        if (existingEmail) return res.status(400).json({ message: "Email jest już zajęty." });
+        if (existingEmail) return res.status(400).json({ message: "Email already taken" });
 
         const existingUser = await User.findOne({ where: { username } });
-        if (existingUser) return res.status(400).json({ message: "Nazwa użytkownika jest już zajęta." });
+        if (existingUser) return res.status(400).json({ message: "Username already taken" });
 
-        // 4. Haszowanie hasła
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
@@ -45,40 +39,35 @@ async function createUser(req, res) {
     }
 }
 
-// backend/controllers/userController.js
-
+// for admin panel pagination
 async function getAllUsers(req, res) {
     try {
-        // 1. Pobieramy parametry z URL (np. ?page=2&limit=10)
-        // Domyślnie strona 1, 10 elementów na stronę
+
+        //parametry z url - strona i elementy na stronę
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
 
-        // 2. Obliczamy offset (ile rekordów pominąć)
-        // Np. dla strony 2: (2 - 1) * 10 = pomiń 10 rekordów
+        //ilość rekordów jakie pomijamy od początku
         const offset = (page - 1) * limit;
 
-        // 3. Pobieramy dane z paginacją
         const { count, rows } = await User.findAndCountAll({
             attributes: { exclude: ['password'] },
             limit: limit,
             offset: offset,
-            order: [['createdAt', 'DESC']] // Najnowsi na górze
+            order: [['createdAt', 'DESC']]
         });
 
-        // 4. Zwracamy strukturę z metadanymi
         res.status(200).json({
             totalItems: count,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            users: rows // Tutaj są same dane
+            users: rows
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }
 
-// Pobierz konkretnego usera
 async function getUserById(req, res) {
     try {
         const user = await User.findByPk(req.params.id, {
@@ -103,15 +92,12 @@ async function updateUser(req, res) {
 
         const { username, email, role, password } = req.body;
 
-        // NOWOŚĆ: Jeśli admin zmienia email, sprawdzamy jego format
         if (email && !emailRegex.test(email)) {
-            return res.status(400).json({ message: "Podany adres email ma nieprawidłowy format." });
+            return res.status(400).json({ message: "Incorrect email format" });
         }
 
-        // Przygotowanie danych do aktualizacji
         let updateData = { username, email, role };
 
-        // Jeśli podano hasło, haszujemy je
         if (password && password.trim() !== "") {
             updateData.password = await bcrypt.hash(password, 10);
         }
@@ -124,10 +110,6 @@ async function updateUser(req, res) {
 
         res.status(200).json(userResponse);
     } catch (error) {
-        // Obsługa błędu unikalności (np. zmiana emaila na taki, który już istnieje)
-        if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ message: "Podany email lub nazwa użytkownika są już zajęte." });
-        }
         res.status(400).json({ message: error.message });
     }
 }
@@ -141,14 +123,10 @@ async function deleteUser(req, res) {
         await user.destroy();
         res.status(204).send();
     } catch (error) {
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-            return res.status(400).json({ message: "Nie można usunąć użytkownika, ponieważ posiada przypisane dane (tablice/zadania)." });
-        }
         res.status(500).json({ message: error.message });
     }
 }
 
-// --- Funkcje pomocnicze (Board/Task/Members) ---
 async function getBoardsByUser(req, res) {
     try {
         const user = await User.findByPk(req.params.id, {

@@ -1,5 +1,5 @@
 // authContext odpowiada za pamiętanie że użytkownik jest zalogowany pomiędzy różnymi stronami
-
+// działa to już po zalogowaniu użytkownika
 import { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext(null);
 
@@ -10,23 +10,18 @@ export const AuthProvider = ({children}) => {
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
-
-        console.log("Start useEffect. StoredUser:", storedUser); // LOG 1
-
+        // sprawdzamy usera i token z pamięci przeglądarki
         if (storedUser) {
             try {
                 const parsedUser = JSON.parse(storedUser);
-                console.log("Parsed User:", parsedUser);
-                console.log("Token:", token);
 
                 if (token || parsedUser.role === 'guest') {
-                    console.log("Warunek spełniony! Przywracam sesję.");
                     setUser(parsedUser);
                 } else {
-                    console.log("Warunek NIE spełniony. Brakuje tokena lub roli.");
+                    console.log("Missing token");
                 }
             } catch (e) {
-                console.error("Błąd parsowania JSON:", e);
+                console.error("Error:", e);
                 localStorage.removeItem('user');
             }
         }
@@ -65,10 +60,9 @@ export const AuthProvider = ({children}) => {
     const value = {
     user, login, logout, loginAsGuest, isAdmin, loading};
 
-    //jak skońćzy się loading to ładujemy
-    return (
+    return ( //wysyłamy nasze dane
         <AuthContext.Provider value={value}>
             {!loading && children}
-        </AuthContext.Provider>
+        </AuthContext.Provider>//jak skońćzy się loading to ładujemy stronę
     )
 }

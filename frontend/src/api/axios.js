@@ -11,7 +11,7 @@ const api = axios.create({
 
 // interceptor - zanim zapytanie pójdzie, sprawdzamy czy jest token.
 // na podstawie tokena odbywa się dostęp do zasobów
-
+// ta część wysyła żądania z tokenem z api do backendu (routes) i potem przez authMiddleware do kontrolera
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token');

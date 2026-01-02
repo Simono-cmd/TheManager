@@ -5,16 +5,19 @@ import Modal from '../../components/common/Modal';
 import { getAllTasks, deleteTask, updateTask, createTask } from '../../api/tasks.api';
 import { getMembersByTaskId } from '../../api/taskMembers.api';
 import '../../assets/styles/admin-style.css';
+import {useAuth} from "../../hooks/useAuth.jsx";
 
 const AdminTasksPage = () => {
     // --- STANY DANYCH ---
+    const { user } = useAuth();
+
     const [tasks, setTasks] = useState([]);
     // Usunięto filteredTasks i searchQuery (paginacja backendowa gryzie się z filtrowaniem frontendowym)
 
     // --- STANY PAGINACJI GŁÓWNEJ ---
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const ITEMS_PER_PAGE = 10;
+    const ITEMS_PER_PAGE = 8;
 
     // --- STANY MODALI ---
     const [isDetailsOpen, setDetailsOpen] = useState(false);
@@ -47,7 +50,12 @@ const AdminTasksPage = () => {
         }
     };
 
-    useEffect(() => { fetchTasks(currentPage); }, [currentPage]);
+    useEffect(() => {
+        document.title = `AdminMode - ${user.username}`;
+        (async () => {
+            await fetchTasks(currentPage);
+        })();
+    }, [currentPage]);
 
     // --- OBSŁUGA ZMIANY STRONY (GŁÓWNA TABELA) ---
     const handlePageChange = (newPage) => {
@@ -169,7 +177,7 @@ const AdminTasksPage = () => {
     return (
         <div className="admin-container">
             <AdminToolbar
-                title="Zarządzanie Zadaniami"
+                title="Manage tasks"
                 onAdd={openAddModal}
             />
 

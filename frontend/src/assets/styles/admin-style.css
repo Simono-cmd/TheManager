@@ -1,6 +1,4 @@
-/* src/assets/styles/admin-style.css */
 
-/* --- HEADER I TOOLBAR --- */
 .admin-header-row {
     display: flex;
     justify-content: space-between;
@@ -26,7 +24,7 @@
 
 .admin-input, .admin-select {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #e1e1e1;
     border-radius: 4px;
     font-size: 0.9rem;
 }
@@ -40,7 +38,6 @@
     transition: 0.2s;
 }
 
-/* Specyficzny przycisk dodawania */
 .admin-toolbar .btn-add {
     background-color: #4CAF50;
     color: white;
@@ -49,7 +46,6 @@
     background-color: #45a049;
 }
 
-/* --- GŁÓWNY KONTENER --- */
 .admin-container {
     padding: 30px;
     max-width: 1200px;
@@ -65,7 +61,6 @@
     overflow-y: visible;
 }
 
-/* --- TABELA ADMINA --- */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -76,22 +71,17 @@
     padding: 15px;
     text-align: left;
     font-weight: 600;
-    color: #555;
-    border-bottom: 2px solid #ddd;
+    color: #515151;
+    border-bottom: 2px solid #bcbcbc;
 }
 
 .admin-table td {
     padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    color: #333;
+    border-bottom: 1px solid #ededed;
+    color: #353535;
 }
 
 .admin-table tr:hover { background-color: #f9f9f9; }
-
-/* --- AKCJE W TABELI (NAPRAWA KONFLIKTU) --- */
-/* Dodajemy .admin-table przed klasami przycisków.
-   Dzięki temu te kolory zadziałają TYLKO wewnątrz tabeli admina,
-   a nie na TaskCard w Dashboardzie. */
 
 .admin-table .action-btn {
     margin-right: 5px;
@@ -103,17 +93,16 @@
     color: white;
 }
 
-.admin-table .btn-details { background-color: #2196F3; } /* Niebieski */
-.admin-table .btn-edit { background-color: #FF9800; }    /* Pomarańczowy */
-.admin-table .btn-delete { background-color: #f44336; }  /* Czerwony */
+.admin-table .btn-details { background-color: #2196F3; }
+.admin-table .btn-edit { background-color: #FF9800; }
+.admin-table .btn-delete { background-color: #f44336; }
 
-/* --- MODAL W ADMINIE --- */
 .details-section h3 {
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #efefef;
     padding-bottom: 5px;
     margin-top: 20px;
     font-size: 1.1rem;
-    color: #444;
+    color: #474646;
 }
 
 .mini-table {
@@ -136,7 +125,6 @@
     text-align: center;
 }
 
-/* Style przycisków w modalu (Uniwersalne - te mogą zostać wspólne) */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -160,7 +148,7 @@
 
 .secondary-btn {
     background-color: #e0e0e0;
-    color: #333;
+    color: #353535;
     border: none;
     padding: 10px 20px;
     border-radius: 4px;

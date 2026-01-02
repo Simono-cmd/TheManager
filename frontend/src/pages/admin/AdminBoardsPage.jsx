@@ -5,15 +5,18 @@ import Modal from '../../components/common/Modal';
 import { getAllBoardsAdmin, createBoardAdmin, updateBoard, deleteBoard } from '../../api/boards.api';
 import { getTasksByBoardId } from '../../api/tasks.api';
 import '../../assets/styles/admin-style.css';
+import {useAuth} from "../../hooks/useAuth.jsx";
 
 const AdminBoardsPage = () => {
+    const { user } = useAuth();
+
     // --- STANY DANYCH ---
     const [boards, setBoards] = useState([]);
 
     // --- PAGINACJA GŁÓWNA (BACKEND) ---
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const ITEMS_PER_PAGE = 10;
+    const ITEMS_PER_PAGE = 8;
 
     // --- STANY MODALI ---
     const [isDetailsOpen, setDetailsOpen] = useState(false);
@@ -44,7 +47,12 @@ const AdminBoardsPage = () => {
         }
     };
 
-    useEffect(() => { fetchBoards(currentPage); }, [currentPage]);
+    useEffect(() => {
+        document.title = `AdminMode - ${user.username}`;
+        (async () => {
+            await fetchBoards(currentPage);
+        })();
+    }, [currentPage]);
 
     // --- OBSŁUGA STRON TABELI GŁÓWNEJ ---
     const handlePageChange = (newPage) => {

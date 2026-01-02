@@ -4,13 +4,13 @@ import AdminTable from '../../components/admin/AdminTable';
 import Modal from '../../components/common/Modal';
 import { getAllUsers, deleteUser, updateUser, getUserBoards, getUserTasks, createUser } from '../../api/users.api';
 import '../../assets/styles/admin-style.css';
+import {useAuth} from "../../hooks/useAuth.jsx";
 
 const AdminUsersPage = () => {
-    // --- STANY DANYCH ---
+    const { user } = useAuth();
+
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [roleFilter, setRoleFilter] = useState('');
 
     // --- STANY PAGINACJI GŁÓWNEJ ---
     const [currentPage, setCurrentPage] = useState(1);
@@ -49,16 +49,11 @@ const AdminUsersPage = () => {
     };
 
     useEffect(() => {
-        fetchUsers(currentPage);
+        document.title = `AdminMode - ${user.username}`;
+        (async () => {
+            await fetchUsers(currentPage);
+        })();
     }, [currentPage]);
-
-    // --- FILTROWANIE ---
-    useEffect(() => {
-        let result = users;
-        if (searchQuery) result = result.filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase()));
-        if (roleFilter) result = result.filter(u => u.role === roleFilter);
-        setFilteredUsers(result);
-    }, [searchQuery, roleFilter, users]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -91,10 +86,8 @@ const AdminUsersPage = () => {
         setDeleteOpen(true);
     };
 
-    // --- LOGIKA AKCJI ---
     const handleDetails = async (user) => {
         setSelectedUser(user);
-        // NOWE: Resetujemy paginację modala przy każdym otwarciu nowego usera
         setBoardsPage(1);
         setTasksPage(1);
         setMembershipsPage(1);
@@ -126,7 +119,7 @@ const AdminUsersPage = () => {
             }
             closeEditAddModal();
             setSelectedUser(null);
-            fetchUsers(currentPage);
+            await fetchUsers(currentPage);
         } catch (error) {
             const msg = error.response?.data?.message || error.message;
             setActionError(msg);
@@ -140,7 +133,7 @@ const AdminUsersPage = () => {
             await deleteUser(userToDelete.id);
             setDeleteOpen(false);
             setUserToDelete(null);
-            fetchUsers(currentPage);
+            await fetchUsers(currentPage);
         } catch (error) {
             const msg = error.response?.data?.message || error.message;
             setActionError(msg);
@@ -273,7 +266,7 @@ const AdminUsersPage = () => {
             </Modal>
 
             {/* --- MODAL EDYCJI / DODAWANIA --- */}
-            <Modal isOpen={isEditOpen || isAddOpen} onClose={closeEditAddModal} title={selectedUser ? "Edytuj" : "Dodaj Użytkownika"}>
+            <Modal isOpen={isEditOpen || isAddOpen} onClose={closeEditAddModal} title={selectedUser ? "Edit" : "Add user"}>
                 <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <label>Username: <input name="username" defaultValue={selectedUser?.username} required className="admin-input" /></label>
                     <label>Email: <input name="email" defaultValue={selectedUser?.email} required className="admin-input" /></label>

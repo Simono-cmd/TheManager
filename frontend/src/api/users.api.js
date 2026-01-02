@@ -6,12 +6,9 @@ export const createUser = async (userData) => {
 };
 
 
-// Zmieniamy tę funkcję, aby przyjmowała numer strony (domyślnie 1)
 export const getAllUsers = async (page = 1, limit = 10) => {
-    // Przekazujemy parametry w URL
     const response = await api.get(`/users?page=${page}&limit=${limit}`);
     return response.data;
-    // Teraz to zwróci obiekt: { totalItems, totalPages, currentPage, users: [...] }
 };
 
 
@@ -42,8 +39,3 @@ export const getUserTasks = async (id) => {
     return response.data;
 };
 
-
-export const getUserTaskMembers = async (id) => {
-    const response = await api.get(`/users/${id}/task-members`);
-    return response.data;
-};

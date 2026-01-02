@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const TaskController = require('../controllers/taskController');
-const authMiddleware = require("../middleware/authMiddleware");
+import {authMiddleware} from "../middleware/authMiddleware";
 
 
 router.post('/', authMiddleware, TaskController.createTask);

@@ -1,6 +1,11 @@
+import {useEffect} from "react";
 import { Link } from "react-router-dom";
 
 function NotFoundPage() {
+
+    useEffect(() => {
+        document.title = "404 Not Found";
+    }, []);
     return (
         <div className="login-page-wrapper">
             <div className="login-container">

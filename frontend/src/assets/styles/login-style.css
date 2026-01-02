@@ -100,7 +100,7 @@
     font-size: 1em;
     background-color: #585d60;
     color: #8dc3f1;
-    border: 1px solid #444;
+    border: 1px solid #4a4a4a;
     padding: 0.5em;
     width: 80%;
     border-radius: 4px;
@@ -129,7 +129,7 @@
     transform: translateY(-50%);
     cursor: pointer;
     user-select: none;
-    color: #ccc;
+    color: #cfcfcf;
     font-size: 1.2em;
 }
 

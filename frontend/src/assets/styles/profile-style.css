@@ -20,7 +20,6 @@
     border-bottom: 1px solid #e1e1e1;
 }
 
-/* --- Karty Sekcji --- */
 .profile-section {
     background: white;
     border-radius: 8px;
@@ -32,20 +31,17 @@
 
 .section-header {
     margin-top: 0;
-    margin-bottom: 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid #f0f0f0;
     font-size: 1.3rem;
-    color: #444;
+    color: #444444;
     font-family: sans-serif;
     font-weight: bold;
 }
 
-/* Kolorowe akcenty przy nagłówkach */
-.section-header.green-border { border-left: 5px solid #4CAF50; padding-left: 15px; }
-.section-header.blue-border { border-left: 5px solid #567dc2; padding-left: 15px; }
+.section-header.green-border { border-left: 7px solid #4CAF50; padding-left: 15px; }
+.section-header.blue-border { border-left: 7px solid #567dc2; padding-left: 15px; }
 
-/* --- Tabela Danych Użytkownika --- */
 .user-info-table {
     width: 100%;
     border-collapse: collapse;
@@ -55,19 +51,18 @@
     padding: 15px;
     border-bottom: 1px solid #f0f0f0;
     font-size: 1rem;
-    color: #333;
+    color: #333333;
 }
 
 .user-info-table tr:last-child td { border-bottom: none; }
 
 .user-info-label {
     font-weight: bold;
-    color: #555;
+    color: #5a5a5a;
     width: 200px;
     background-color: #fafafa;
 }
 
-/* --- Tabela Zadań --- */
 .tasks-table {
     width: 100%;
     border-collapse: collapse;
@@ -76,26 +71,27 @@
 
 .tasks-table th {
     background-color: #f8f9fa;
-    color: #666;
+    color: #6c6c6c;
     font-weight: bold;
     text-align: left;
     padding: 12px 15px;
     border-bottom: 2px solid #e9ecef;
-    font-size: 0.85em;
+    font-size: 0.9em;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .tasks-table td {
-    padding: 12px 15px;
+    padding: 8px 10px;
     border-bottom: 1px solid #f0f0f0;
-    color: #333;
-    font-size: 0.95rem;
+    color: #333333;
+    font-size: 0.9em;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
 }
 
 .tasks-table tr:hover { background-color: #fbfbfb; }
 
-/* --- Status Badges --- */
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;
@@ -109,7 +105,7 @@
 .status-completed { background-color: #e8f5e9; color: #2e7d32; }
 
 .empty-message {
-    color: #888;
+    color: #8e8e8e;
     font-style: italic;
     padding: 15px;
     text-align: center;

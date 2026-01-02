@@ -3,15 +3,13 @@ import { useAuth } from '../hooks/useAuth';
 
 const ProtectedRoute = ({ allowedRoles }) => {
     const { user, loading } = useAuth();
-    const location = useLocation();
 
     if (loading) return <p>Loading...</p>;
-
-
     if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/" replace/>;
     }
 
+    // kontrolujemy dostęp do zasobów czy user ma wymaganą rolę do dostępu
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         return <Navigate to="*" replace />;
     }

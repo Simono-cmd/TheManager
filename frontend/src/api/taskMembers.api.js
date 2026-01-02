@@ -1,11 +1,10 @@
 import api from './axios.js';
 
-// ZMIANA: Przyjmujemy taskId i userId, a wysyłamy obiekt
 export const assignUserToTask = async (taskId, userId) => {
     const response = await api.post('/task-members', {
         taskId: taskId,
         userId: userId,
-        role: 'member' // Domyślna rola
+        role: 'member'
     });
     return response.data;
 };

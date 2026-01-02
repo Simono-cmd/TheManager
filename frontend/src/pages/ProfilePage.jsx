@@ -12,6 +12,8 @@ const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        document.title = `Profile - ${user.username}`;
+
         if (user?.role === 'guest') {
             setIsLoading(false);
             return;
@@ -19,14 +21,11 @@ const ProfilePage = () => {
 
         const fetchProfileData = async () => {
             try {
-                // 1. Pobieramy dane
                 const userData = await getUserById(user.id);
                 setProfileData(userData);
 
-                // 2. Pobieramy zadania
                 const allTasks = await getUserTasks(user.id);
 
-                // 3. Filtrujemy (Owner vs Member)
                 const owned = allTasks.filter(t => t.TaskMember && t.TaskMember.role === 'owner');
                 const assigned = allTasks.filter(t => t.TaskMember && t.TaskMember.role !== 'owner');
 
@@ -34,7 +33,7 @@ const ProfilePage = () => {
                 setAssignedTasks(assigned);
 
             } catch (error) {
-                console.error("Błąd ładowania profilu:", error);
+                console.error("Error loading profile:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -58,7 +57,6 @@ const ProfilePage = () => {
         return <div className="profile-container"><p>Loading...</p></div>;
     }
 
-    // --- WIDOK WŁAŚCIWY ---
     return (
         <div className="profile-wrapper-scroll">
         <div className="profile-container">

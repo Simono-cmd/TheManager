@@ -1,4 +1,3 @@
-// src/components/admin/AdminToolbar.jsx
 import React from 'react';
 
 const AdminToolbar = ({ title, onAdd }) => {
@@ -8,7 +7,7 @@ const AdminToolbar = ({ title, onAdd }) => {
 
             <div className="admin-toolbar">
                 <button className="admin-btn btn-add" onClick={onAdd}>
-                    + Dodaj
+                    + Add
                 </button>
             </div>
         </div>

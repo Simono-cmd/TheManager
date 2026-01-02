@@ -56,9 +56,10 @@ async function login(req, res) {
         const token = jwt.sign(
             { id: user.id, role: user.role, username: user.username },
             JWT_SECRET,
-            { expiresIn: '6h' }
+            { expiresIn: '2h' }
         );
 
+        //tu wysyłamy obiekt user i login do AuthContext
         res.json({
             message: 'Logged in',
             token: token,

@@ -34,6 +34,7 @@ const DashboardPage = () => {
 
     // 1. Pobieranie zadań po zmianie tablicy
     useEffect(() => {
+        document.title = "Dashboard | TheManager";
         if (activeBoard) {
             fetchTasks(activeBoard.id);
         } else {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const BoardController = require('../controllers/boardController');
-const authMiddleware = require('../middleware/authMiddleware');
+import {authMiddleware} from "../middleware/authMiddleware";
 
 router.post('/', authMiddleware, BoardController.createBoard);
 router.post('/admin-create', authMiddleware, BoardController.createBoardAdmin);
