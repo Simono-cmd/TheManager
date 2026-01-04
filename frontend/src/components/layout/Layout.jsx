@@ -21,6 +21,7 @@ const Layout = () => {
                     <div id="title">TheManager</div>
                 </div>
 
+                {/*navigation for admin panel*/}
                 {(user?.role === 'admin' && location.pathname.startsWith('/admin')) && (
                     <nav className="admin-nav">
                         <Link to="/admin/boards" className="admin-link">Boards</Link>
@@ -31,8 +32,10 @@ const Layout = () => {
 
                 <div className="profile-wrapper">
                     <img id="profile-icon" src="/media/profile.png" alt="Profile" />
+
+                    {/*dropdown list*/}
                     <div className="dropdown">
-                        <p style={{borderBottom: '1px solid #eee', paddingBottom: '5px', marginBottom: '5px'}}>
+                        <p style={{borderBottom: '1px solid #eeeeee', paddingBottom: '5px', marginBottom: '5px'}}>
                             Hello, <strong>{user?.username}</strong>!
                         </p>
                         <ul>
@@ -54,6 +57,7 @@ const Layout = () => {
                 </div>
             </header>
 
+            {/*everything inserted below the header*/}
             <div className="content-wrapper">
                 <Outlet />
             </div>

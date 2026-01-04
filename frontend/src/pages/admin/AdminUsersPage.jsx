@@ -8,46 +8,43 @@ import {useAuth} from "../../hooks/useAuth.jsx";
 
 const AdminUsersPage = () => {
     const { user } = useAuth();
-
     const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
 
-    // --- STANY PAGINACJI GŁÓWNEJ ---
+    //paginacja strony głównej (server side)
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const ITEMS_PER_PAGE = 8;
 
-    // --- STANY MODALI ---
+    //states dla modali
     const [isDetailsOpen, setDetailsOpen] = useState(false);
     const [isEditOpen, setEditOpen] = useState(false);
-    const [isAddOpen, setAddOpen] = useState(false);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
 
-    // --- STANY POMOCNICZE ---
+    //states pomocnicze
     const [userToDelete, setUserToDelete] = useState(null);
     const [actionError, setActionError] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [selectedUserRelations, setSelectedUserRelations] = useState({ boards: [], tasks: [], memberships: [] });
+    const [selectedUserBoards , setSelectedUserBoards] = useState([]);
+    const [selectedUserTasks , setSelectedUserTasks] = useState([]);
+    const [selectedUserMemberships , setSelectedUserMemberships] = useState([]);
 
-    // --- NOWE: STANY PAGINACJI W MODALU ---
+    // paginacja dla modali (client side)
     const [boardsPage, setBoardsPage] = useState(1);
     const [tasksPage, setTasksPage] = useState(1);
     const [membershipsPage, setMembershipsPage] = useState(1);
-    const MODAL_ITEMS_PER_PAGE = 5; // Ile elementów na stronę w modalu
+    const MODAL_ITEMS_PER_PAGE = 5;
 
-    // --- POBIERANIE DANYCH ---
+    // pobieranie użytkowników
     const fetchUsers = async (page) => {
         try {
             const data = await getAllUsers(page, ITEMS_PER_PAGE);
             setUsers(data.users);
-            setFilteredUsers(data.users);
             setTotalPages(data.totalPages);
             setCurrentPage(data.currentPage);
         } catch (error) {
-            console.error(error);
+            console.error("Error fetching data:", error);
         }
     };
-
     useEffect(() => {
         document.title = `AdminMode - ${user.username}`;
         (async () => {
@@ -55,17 +52,20 @@ const AdminUsersPage = () => {
         })();
     }, [currentPage]);
 
+    // zmiana stron - server side
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
         }
     };
 
-    // --- HELPERY OTWIERANIA MODALI ---
+    // obsługa modali
+
+    //modal add i edit bazują na tym samym stanie, obsługa różni się w zależności czy to przycisk który ma selecteduser czy nie
     const openAddModal = () => {
         setSelectedUser(null);
         setActionError(null);
-        setAddOpen(true);
+        setEditOpen(true);
     };
 
     const openEditModal = (user) => {
@@ -74,9 +74,8 @@ const AdminUsersPage = () => {
         setEditOpen(true);
     };
 
-    const closeEditAddModal = () => {
+    const closeEditModal = () => {
         setEditOpen(false);
-        setAddOpen(false);
         setActionError(null);
     };
 
@@ -86,6 +85,7 @@ const AdminUsersPage = () => {
         setDeleteOpen(true);
     };
 
+    //modal szczegółów
     const handleDetails = async (user) => {
         setSelectedUser(user);
         setBoardsPage(1);
@@ -98,16 +98,21 @@ const AdminUsersPage = () => {
             const ownedTasks = tasks.filter(t => t.TaskMember?.role === 'owner');
             const memberTasks = tasks.filter(t => t.TaskMember?.role !== 'owner');
 
-            setSelectedUserRelations({ boards, tasks: ownedTasks, memberships: memberTasks });
+            // zapisujemy zależności między userami do tablic, zadań i taskmember
+            setSelectedUserBoards(boards);
+            setSelectedUserTasks(ownedTasks);
+            setSelectedUserMemberships(memberTasks)
             setDetailsOpen(true);
         } catch (error) {
-            alert("Błąd pobierania szczegółów");
-        }
+            console.error(error);        }
     };
 
+    // obsługa zapisania użytkownika (nowy i edit) - jeśli jest selectedUser to edit
     const handleSaveUser = async (e) => {
         e.preventDefault();
         setActionError(null);
+
+        //pobranie danych z formularza
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
@@ -117,15 +122,16 @@ const AdminUsersPage = () => {
             } else {
                 await createUser(data);
             }
-            closeEditAddModal();
+            closeEditModal();
             setSelectedUser(null);
             await fetchUsers(currentPage);
         } catch (error) {
-            const msg = error.response?.data?.message || error.message;
+            const msg = error.response?.data?.message;
             setActionError(msg);
         }
     };
 
+    // potwierdzenie usunięcia użytkownika
     const confirmDelete = async () => {
         if (!userToDelete) return;
         setActionError(null);
@@ -135,161 +141,176 @@ const AdminUsersPage = () => {
             setUserToDelete(null);
             await fetchUsers(currentPage);
         } catch (error) {
-            const msg = error.response?.data?.message || error.message;
+            const msg = error.response?.data?.message;
             setActionError(msg);
         }
     };
 
-    // --- NOWE: Helper do renderowania kontrolek paginacji wewnątrz modala ---
+    // rysowanie przycisków do paginacji - client side
     const renderPaginationControls = (currentPage, totalItems, setPage) => {
         const totalPages = Math.ceil(totalItems / MODAL_ITEMS_PER_PAGE);
         if (totalPages <= 1) return null;
 
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px', fontSize: '0.9rem' }}>
-                <button
-                    onClick={() => setPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    style={{ cursor: currentPage === 1 ? 'default' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
-                >
-                    &lt;
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px', fontSize: '1em' }}>
+                <button onClick={() => setPage(currentPage - 1) } className="pagination-modal-btn"
+                    disabled={currentPage === 1}>&lt;
                 </button>
                 <span>{currentPage} / {totalPages}</span>
-                <button
-                    onClick={() => setPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    style={{ cursor: currentPage === totalPages ? 'default' : 'pointer', opacity: currentPage === totalPages ? 0.5 : 1 }}
-                >
-                    &gt;
+                <button onClick={() => setPage(currentPage + 1)} className="pagination-modal-btn"
+                    disabled={currentPage === totalPages}>&gt;
                 </button>
             </div>
         );
     };
 
-    // --- NOWE: Helper do cięcia danych dla aktualnej strony ---
+    // client side pagination data getter
     const getPaginatedData = (data, page) => {
         const startIndex = (page - 1) * MODAL_ITEMS_PER_PAGE;
         return data.slice(startIndex, startIndex + MODAL_ITEMS_PER_PAGE);
     };
 
+    // dane do narysowania tabeli
     const columns = [
         { key: 'id', label: 'ID' },
-        { key: 'username', label: 'Nazwa Użytkownika' },
+        { key: 'username', label: 'Username' },
         { key: 'email', label: 'Email' },
-        { key: 'role', label: 'Rola', render: (u) => <span className={`status-badge status-${u.role === 'admin' ? 'completed' : 'todo'}`}>{u.role}</span> },
-        { key: 'createdAt', label: 'Utworzono', render: (u) => new Date(u.createdAt).toLocaleDateString() }
+        { key: 'role', label: 'Role'},
+        { key: 'createdAt', label: 'Created at', render: (date) => new Date(date.createdAt).toLocaleDateString() }
     ];
 
     return (
         <div className="admin-container">
-            <AdminToolbar title="Manage Users" onAdd={openAddModal}/>
+            {/* header - with add button and title*/}
+            <AdminToolbar title="Manage users" onAdd={openAddModal}/>
 
+            {/* drawing table */}
             <AdminTable
                 columns={columns}
-                data={filteredUsers}
+                data={users}
                 actions={{ onDetails: handleDetails, onEdit: openEditModal, onDelete: openDeleteModal }}
             />
 
-            {/* Paginacja głównej tabeli */}
+            {/*main pagination - server side*/}
             {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
-                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="secondary-btn">&lt; Poprzednia</button>
-                    <span>Strona {currentPage} z {totalPages}</span>
-                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="secondary-btn">Następna &gt;</button>
+                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="secondary-btn">&lt;</button>
+                    <span> {currentPage} / {totalPages}</span>
+                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="secondary-btn">&gt;</button>
                 </div>
             )}
 
-            {/* --- MODAL DETALI --- */}
-            <Modal isOpen={isDetailsOpen} onClose={() => setDetailsOpen(false)} title={`Szczegóły: ${selectedUser?.username}`}>
+            {/*details modal for user*/}
+            <Modal isOpen={isDetailsOpen} onClose={() => setDetailsOpen(false)} title={`Details: ${selectedUser?.username}`}>
                 {selectedUser && (
                     <div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '5px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr ', gap: '10px', marginBottom: '20px', padding: '15px', background: '#f3f3f3', borderRadius: '5px' }}>
+                            {/*Mapujemy wszystkie pola z tablicy naszego usera i poprawiamy wyświetlanie daty*/}
                             {Object.entries(selectedUser).map(([key, value]) => {
-                                if (typeof value === 'object' && value !== null) return null;
                                 if (key === 'password') return null;
-                                const displayValue = (key.includes('At') && value) ? new Date(value).toLocaleString() : (value?.toString() || '-');
-                                return (<div key={key} style={{ borderBottom: '1px solid #eee', paddingBottom: '5px' }}><strong style={{ textTransform: 'capitalize', color: '#555' }}>{key}: </strong><span>{displayValue}</span></div>);
+                                const displayValue = (key.includes('At')) ? new Date(value).toLocaleString() : (value?.toString() || '-');
+                                return (<div key={key} ><strong style={{ textTransform: 'capitalize', color: '#555555' }}>{key}: </strong><span>{displayValue}</span></div>);
                             })}
                         </div>
 
-                        {/* SEKCJA TABLIC */}
+                        {/* list of user tables in modal */}
                         <div className="details-section">
-                            <h3>Posiadane Tablice ({selectedUserRelations.boards.length})</h3>
-                            {selectedUserRelations.boards.length > 0 ? (
+                            <h3>Owned boards ({selectedUserBoards.length})</h3>
+                            {selectedUserBoards.length > 0 ? (
                                 <>
                                     <table className="mini-table">
-                                        <thead><tr><th>ID</th><th>Nazwa</th></tr></thead>
+                                        <thead><tr><th>ID</th><th>Name</th></tr></thead>
                                         <tbody>
-                                        {/* Wyświetlamy tylko wycinek tablicy */}
-                                        {getPaginatedData(selectedUserRelations.boards, boardsPage).map(b => (
-                                            <tr key={b.id}><td>{b.id}</td><td>{b.name}</td></tr>
+                                        {/*Mapujemy - wyciągamy zadania naszego usera  */}
+                                        {getPaginatedData(selectedUserBoards, boardsPage).map(b => (
+                                            <tr key={b.id}>
+                                                <td>{b.id}</td>
+                                                <td>{b.name}</td>
+                                            </tr>
                                         ))}
                                         </tbody>
                                     </table>
                                     {/* Kontrolki paginacji */}
-                                    {renderPaginationControls(boardsPage, selectedUserRelations.boards.length, setBoardsPage)}
+                                    {renderPaginationControls(boardsPage, selectedUserBoards.length, setBoardsPage)}
                                 </>
-                            ) : <p>Brak tablic.</p>}
+                            ) : <p>No data</p>}
                         </div>
 
-                        {/* SEKCJA ZADAŃ (Właściciel) */}
+                        {/* Tasks created by user list in modal */}
                         <div className="details-section">
-                            <h3>Zadania (Właściciel) - Total: {selectedUserRelations.tasks.length}</h3>
-                            {selectedUserRelations.tasks.length > 0 ? (
+                            <h3>Tasks (owner) - Total: {selectedUserTasks.length}</h3>
+                            {selectedUserTasks.length > 0 ? (
                                 <>
-                                    <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
-                                        {getPaginatedData(selectedUserRelations.tasks, tasksPage).map(t => (
-                                            <li key={t.id}>{t.title} ({t.status})</li>
+                                    <table className="mini-table">
+                                        <thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead>
+                                        <tbody>
+                                        {/*Mapujemy - wyciągamy zadania taskmember naszego usera  */}
+                                        {getPaginatedData(selectedUserTasks, tasksPage).map(b => (
+                                            <tr key={b.id}>
+                                                <td>{b.id}</td>
+                                                <td>{b.title}</td>
+                                                <td>{b.status}</td>
+                                            </tr>
                                         ))}
-                                    </ul>
-                                    {renderPaginationControls(tasksPage, selectedUserRelations.tasks.length, setTasksPage)}
+                                        </tbody>
+                                    </table>
+                                    {renderPaginationControls(tasksPage, selectedUserTasks.length, setTasksPage)}
                                 </>
-                            ) : <p>Brak zadań.</p>}
+                            ) : <p>No data</p>}
                         </div>
 
-                        {/* SEKCJA ZADAŃ (Członek) */}
+                        {/* Tasks where the user is a member */}
                         <div className="details-section">
-                            <h3>Zadania (Członek) - Total: {selectedUserRelations.memberships.length}</h3>
-                            {selectedUserRelations.memberships.length > 0 ? (
+                            <h3>Tasks (member) - Total: {selectedUserMemberships.length}</h3>
+                            {selectedUserMemberships.length > 0 ? (
                                 <>
-                                    <ul style={{ marginTop: '10px', paddingLeft: '20px' }}>
-                                        {getPaginatedData(selectedUserRelations.memberships, membershipsPage).map(t => (
-                                            <li key={t.id}>{t.title}</li>
+                                    <table className="mini-table">
+                                        <thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead>
+                                        <tbody>
+                                        {/*Mapujemy - wyciągamy zadania naszego usera - taskmember  */}
+                                        {getPaginatedData(selectedUserMemberships, membershipsPage).map(b => (
+                                            <tr key={b.id}>
+                                                <td>{b.id}</td>
+                                                <td>{b.title}</td>
+                                                <td>{b.status}</td>
+                                            </tr>
                                         ))}
-                                    </ul>
-                                    {renderPaginationControls(membershipsPage, selectedUserRelations.memberships.length, setMembershipsPage)}
+                                        </tbody>
+                                    </table>
+                                    {renderPaginationControls(membershipsPage, selectedUserMemberships.length, setMembershipsPage)}
                                 </>
-                            ) : <p>Brak przypisań.</p>}
+                            ) : <p>No data</p>}
                         </div>
                     </div>
                 )}
             </Modal>
 
-            {/* --- MODAL EDYCJI / DODAWANIA --- */}
-            <Modal isOpen={isEditOpen || isAddOpen} onClose={closeEditAddModal} title={selectedUser ? "Edit" : "Add user"}>
+            {/* Modal for adding/editing users (the logic is the same so just the texts will be different */}
+            <Modal isOpen={isEditOpen} onClose={closeEditModal} title={selectedUser ? "Edit user" : "Add user"}>
                 <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {/*Labels for adding/editing (password only for adding)*/}
                     <label>Username: <input name="username" defaultValue={selectedUser?.username} required className="admin-input" /></label>
                     <label>Email: <input name="email" defaultValue={selectedUser?.email} required className="admin-input" /></label>
-                    {!selectedUser && <label>Hasło: <input name="password" type="password" required className="admin-input" /></label>}
-                    <label>Rola:
+                    {!selectedUser && <label>Password: <input name="password" type="password" required className="admin-input" /></label>}
+                    <label>Role:
                         <select name="role" defaultValue={selectedUser?.role || 'user'} className="admin-select">
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
                     </label>
-                    {actionError && <div className="error-message">⚠️ {actionError}</div>}
-                    <button type="submit" className="primary-btn" style={{ marginTop: '10px' }}>Zapisz</button>
+                    {actionError && <div className="error-message">{actionError}</div>}
+                    <button type="submit" className="primary-btn" style={{ marginTop: '10px' }}>Save</button>
                 </form>
             </Modal>
 
-            {/* --- MODAL USUWANIA --- */}
-            <Modal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} title="Potwierdź usunięcie">
+            {/*Modal for deleting*/}
+            <Modal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} title="Confirm delete">
                 <div>
-                    <p>Czy na pewno chcesz usunąć użytkownika: <strong>{userToDelete?.username}</strong>?</p>
-                    {actionError && <div className="error-message">⚠️ {actionError}</div>}
+                    <p>Are you sure you want to delete user: <strong>{userToDelete?.username}</strong>?</p>
+                    {actionError && <div className="error-message">{actionError}</div>}
                     <div className="modal-actions">
-                        <button onClick={() => setDeleteOpen(false)} className="secondary-btn">Anuluj</button>
-                        <button onClick={confirmDelete} className="danger-btn">Usuń</button>
+                        <button onClick={() => setDeleteOpen(false)} className="secondary-btn">Cancel</button>
+                        <button onClick={confirmDelete} className="danger-btn">Delete</button>
                     </div>
                 </div>
             </Modal>

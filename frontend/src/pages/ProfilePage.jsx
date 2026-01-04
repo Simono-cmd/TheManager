@@ -6,49 +6,46 @@ import '../assets/styles/profile-style.css';
 const ProfilePage = () => {
     const { user } = useAuth();
 
+    // states
     const [profileData, setProfileData] = useState(null);
     const [ownedTasks, setOwnedTasks] = useState([]);
     const [assignedTasks, setAssignedTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    //get all data
+    const fetchProfileData = async () => {
+        try {
+            const userData = await getUserById(user.id);
+            setProfileData(userData);
+
+            const allTasks = await getUserTasks(user.id);
+
+            // we're getting user tasks and filtering them through task member role
+            const owned = allTasks.filter(t => t.TaskMember && t.TaskMember.role === 'owner');
+            const assigned = allTasks.filter(t => t.TaskMember && t.TaskMember.role !== 'owner');
+
+            setOwnedTasks(owned);
+            setAssignedTasks(assigned);
+
+        } catch (error) {
+            console.error("Error loading profile:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         document.title = `Profile - ${user.username}`;
 
-        if (user?.role === 'guest') {
-            setIsLoading(false);
-            return;
-        }
-
-        const fetchProfileData = async () => {
-            try {
-                const userData = await getUserById(user.id);
-                setProfileData(userData);
-
-                const allTasks = await getUserTasks(user.id);
-
-                const owned = allTasks.filter(t => t.TaskMember && t.TaskMember.role === 'owner');
-                const assigned = allTasks.filter(t => t.TaskMember && t.TaskMember.role !== 'owner');
-
-                setOwnedTasks(owned);
-                setAssignedTasks(assigned);
-
-            } catch (error) {
-                console.error("Error loading profile:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (user) {
-            fetchProfileData();
-        }
+        if (user){
+            (async () => {
+                await fetchProfileData();
+            })();}
     }, [user]);
 
     const getStatusClass = (status) => {
         switch(status?.toLowerCase()) {
             case 'completed': return 'status-completed';
-            case 'in progress': return 'status-inprogress';
-            case 'failed': return 'status-failed';
             default: return 'status-todo';
         }
     };
@@ -60,16 +57,16 @@ const ProfilePage = () => {
     return (
         <div className="profile-wrapper-scroll">
         <div className="profile-container">
-            <h1 className="profile-title">Witaj, {profileData?.username}!</h1>
+            <h1 className="profile-title">Welcome, {profileData?.username}!</h1>
 
-            {/* SEKCJA 1: DANE UŻYTKOWNIKA */}
+            {/*section for user data*/}
             <div className="profile-section">
-                <h2 className="section-header">Twoje Dane</h2>
+                <h2 className="section-header">My data:</h2>
                 {profileData && (
                     <table className="user-info-table">
                         <tbody>
                         <tr>
-                            <td className="user-info-label">Użytkownik:</td>
+                            <td className="user-info-label">Username:</td>
                             <td>{profileData.username}</td>
                         </tr>
                         <tr>
@@ -77,10 +74,10 @@ const ProfilePage = () => {
                             <td>{profileData.email}</td>
                         </tr>
                         <tr>
-                            <td className="user-info-label">Data dołączenia:</td>
+                            <td className="user-info-label">Created at:</td>
                             <td>
                                 {profileData.createdAt
-                                    ? new Date(profileData.createdAt).toLocaleDateString('pl-PL')
+                                    ? new Date(profileData.createdAt).toLocaleDateString()
                                     : '-'}
                             </td>
                         </tr>
@@ -89,9 +86,9 @@ const ProfilePage = () => {
                 )}
             </div>
 
-            {/* SEKCJA 2: MOJE ZADANIA (OWNER) */}
+            {/* section for tasks by user*/}
             <div className="profile-section">
-                <h2 className="section-header green-border">Utworzone przeze mnie</h2>
+                <h2 className="section-header green-border">My tasks</h2>
                 {ownedTasks.length > 0 ? (
                     <table className="tasks-table">
                         <thead>

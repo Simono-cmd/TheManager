@@ -3,50 +3,50 @@ import AdminToolbar from '../../components/admin/AdminToolbar';
 import AdminTable from '../../components/admin/AdminTable';
 import Modal from '../../components/common/Modal';
 import { getAllTasks, deleteTask, updateTask, createTask } from '../../api/tasks.api';
-import { getMembersByTaskId } from '../../api/taskMembers.api';
+import {assignUserToTask, getMembersByTaskId, removeUserFromTask} from '../../api/taskMembers.api';
+import {getAllUsers} from "../../api/users.api.js";
 import '../../assets/styles/admin-style.css';
 import {useAuth} from "../../hooks/useAuth.jsx";
 
 const AdminTasksPage = () => {
-    // --- STANY DANYCH ---
     const { user } = useAuth();
-
     const [tasks, setTasks] = useState([]);
-    // Usunięto filteredTasks i searchQuery (paginacja backendowa gryzie się z filtrowaniem frontendowym)
 
-    // --- STANY PAGINACJI GŁÓWNEJ ---
+    // admin task table with pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const ITEMS_PER_PAGE = 8;
 
-    // --- STANY MODALI ---
+    // states for modals
     const [isDetailsOpen, setDetailsOpen] = useState(false);
     const [isEditOpen, setEditOpen] = useState(false);
     const [isDeleteOpen, setDeleteOpen] = useState(false);
 
-    // --- STANY POMOCNICZE ---
+    // additional states
     const [taskToDelete, setTaskToDelete] = useState(null);
     const [actionError, setActionError] = useState(null);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [taskMembers, setTaskMembers] = useState([]);
+    const [getTaskMembers, setGetTaskMembers] = useState([]);
 
-    // --- NOWE: STANY PAGINACJI W MODALU ---
+    //states for editing taskmembers
+    const [allUsers, setAllUsers] = useState([]);
+    const [currentMembers, setCurrentMembers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState('');
+
+    // modal pagination
     const [membersPage, setMembersPage] = useState(1);
     const MODAL_ITEMS_PER_PAGE = 5;
 
-    // --- POBIERANIE DANYCH ---
+    // getting data in
     const fetchTasks = async (page) => {
         try {
-            // Przekazujemy stronę i limit do API
             const data = await getAllTasks(page, ITEMS_PER_PAGE);
 
-            // Backend powinien zwracać obiekt { tasks, totalPages, currentPage }
-            // Jeśli zwraca tablicę, trzeba dostosować backend lub ten kod
-            setTasks(data.tasks || data);
-            setTotalPages(data.totalPages || 1);
-            setCurrentPage(data.currentPage || 1);
+            setTasks(data.tasks);
+            setTotalPages(data.totalPages);
+            setCurrentPage(data.currentPage);
         } catch (error) {
-            console.error("Błąd pobierania zadań:", error);
+            console.error("Error fetching tasks", error);
         }
     };
 
@@ -57,69 +57,94 @@ const AdminTasksPage = () => {
         })();
     }, [currentPage]);
 
-    // --- OBSŁUGA ZMIANY STRONY (GŁÓWNA TABELA) ---
+    // getting users for editing taskmembers
+    useEffect(() => {
+        getAllUsers(1, 1000)
+            .then(data => {
+                    setAllUsers(data.users);
+            })
+            .catch(console.error);
+    }, []);
+
+    // obsługa zmiany stron - server side
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
         }
     };
 
-    // --- FUNKCJE POMOCNICZE (OTWIERANIE/ZAMYKANIE) ---
+    // obsługa modali
     const openAddModal = () => {
         setSelectedTask(null);
         setActionError(null);
         setEditOpen(true);
+        setCurrentMembers([]);
     };
 
-    const openEditModal = (task) => {
+    const openEditModal = async (task) => {
         setSelectedTask(task);
         setActionError(null);
+        setSelectedUserId('');
+
+        //load users for assigning
+        try {
+            const members = await getMembersByTaskId(task.id);
+            setCurrentMembers(members);
+        } catch (error) {
+            console.error("Error getting taskmembers", error);
+            setCurrentMembers([]);
+        }
+
         setEditOpen(true);
+
     };
 
     const closeEditModal = () => {
         setEditOpen(false);
+        setSelectedTask(null);
         setActionError(null);
     };
 
+    // data for details modal
     const handleDetails = async (task) => {
         setSelectedTask(task);
-        // Reset paginacji modala przy otwarciu
         setMembersPage(1);
         try {
             const members = await getMembersByTaskId(task.id);
-            setTaskMembers(members);
+            setGetTaskMembers(members);
             setDetailsOpen(true);
         } catch (error) { console.error(error); }
     };
 
+    // adding/editing tasks (zależy czy jest wybrany selectedTask)
     const handleSave = async (e) => {
         e.preventDefault();
         setActionError(null);
 
+        //pobieramy dane z formularza
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
-        if(data.boardId) data.boardId = parseInt(data.boardId);
 
         try {
             if (selectedTask) await updateTask(selectedTask.id, data);
             else await createTask(data);
 
             setEditOpen(false);
-            fetchTasks(currentPage); // Odśwież bieżącą stronę
+            await fetchTasks(currentPage);
         } catch(e) {
-            const msg = e.response?.data?.message || e.message;
+            const msg = e.message;
             setActionError(msg);
         }
     };
 
-    // --- FUNKCJE USUWANIA ---
+    // modal for deleting
     const openDeleteModal = (task) => {
         setTaskToDelete(task);
         setActionError(null);
         setDeleteOpen(true);
     };
 
+    // funkcja for deleting
     const confirmDelete = async () => {
         if (!taskToDelete) return;
         setActionError(null);
@@ -128,51 +153,80 @@ const AdminTasksPage = () => {
             await deleteTask(taskToDelete.id);
             setDeleteOpen(false);
             setTaskToDelete(null);
-            fetchTasks(currentPage); // Odśwież bieżącą stronę
+            await fetchTasks(currentPage);
         } catch(e) {
-            const msg = e.response?.data?.message || e.message;
+            const msg = e.message;
             setActionError(msg);
         }
     };
 
-    // --- HELPERS DO PAGINACJI W MODALU ---
+
+    // getter for paginated data client side
     const getPaginatedData = (data, page) => {
         const startIndex = (page - 1) * MODAL_ITEMS_PER_PAGE;
-        return data.slice(startIndex, startIndex + MODAL_ITEMS_PER_PAGE);
+        return data.slice(startIndex, startIndex + MODAL_ITEMS_PER_PAGE); //pagination client side
     };
 
+    // rysowanie przycisków do paginacji - client side
     const renderPaginationControls = (currentPage, totalItems, setPage) => {
         const totalPages = Math.ceil(totalItems / MODAL_ITEMS_PER_PAGE);
         if (totalPages <= 1) return null;
 
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px', fontSize: '0.9rem' }}>
-                <button
-                    onClick={() => setPage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    style={{ cursor: currentPage === 1 ? 'default' : 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}
-                >
-                    &lt;
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px', fontSize: '1em' }}>
+                <button onClick={() => setPage(currentPage - 1) } className="pagination-modal-btn"
+                        disabled={currentPage === 1}>&lt;
                 </button>
                 <span>{currentPage} / {totalPages}</span>
-                <button
-                    onClick={() => setPage(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    style={{ cursor: currentPage === totalPages ? 'default' : 'pointer', opacity: currentPage === totalPages ? 0.5 : 1 }}
-                >
-                    &gt;
+                <button onClick={() => setPage(currentPage + 1)} className="pagination-modal-btn"
+                        disabled={currentPage === totalPages}>&gt;
                 </button>
             </div>
         );
     };
 
+    // function for adding new taskmembers in edit mode
+    const handleAddMember = async () => {
+        if (!selectedUserId || !selectedTask) return;
+        setActionError(null);
+
+        try {
+            await assignUserToTask(selectedTask.id, selectedUserId);
+            const members = await getMembersByTaskId(selectedTask.id);
+            setCurrentMembers(members);
+            setSelectedUserId('');
+        } catch (error) {
+            const msg = error.response?.data?.message;
+            setActionError(msg);
+        }
+    };
+
+    //for removing taskmembers in edit
+    const handleRemoveMember = async (userIdToRemove) => {
+        if (!selectedTask) return;
+        setActionError(null);
+        try {
+            await removeUserFromTask(selectedTask.id, userIdToRemove);
+            const members = await getMembersByTaskId(selectedTask.id);
+            setCurrentMembers(members);
+        } catch (error) {
+            const msg = error.response?.data?.message;
+            setActionError(msg);
+        }
+    };
+
     const columns = [
         { key: 'id', label: 'ID' },
-        { key: 'title', label: 'Tytuł' },
+        { key: 'title', label: 'Title' },
         { key: 'status', label: 'Status', render: (t) => <span className={`status-badge status-${t.status.replace(' ', '')}`}>{t.status}</span> },
-        { key: 'board', label: 'Tablica', render: (task) => task.board ? task.board.name : `ID: ${task.boardId}` },
+        { key: 'board', label: 'Board', render: (task) => task.board?.name},
         { key: 'deadline', label: 'Deadline', render: (t) => t.deadline ? new Date(t.deadline).toLocaleDateString() : '-' }
     ];
+
+    // we only show taskmembers that are not already assigned to the task
+    const currentMemberIds = currentMembers.map(m => m.userId);
+    const safeAllUsers = Array.isArray(allUsers) ? allUsers : [];
+    const availableUsers = safeAllUsers.filter(u => !currentMemberIds.includes(u.id));
 
     return (
         <div className="admin-container">
@@ -183,7 +237,7 @@ const AdminTasksPage = () => {
 
             <AdminTable
                 columns={columns}
-                data={tasks} // Bezpośrednio tasks, bez filtrowania client-side
+                data={tasks}
                 actions={{
                     onDetails: handleDetails,
                     onEdit: openEditModal,
@@ -191,98 +245,134 @@ const AdminTasksPage = () => {
                 }}
             />
 
-            {/* --- PASEK PAGINACJI GŁÓWNEJ --- */}
+            {/*main pagination - server side*/}
             {totalPages > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginTop: '20px' }}>
-                    <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="secondary-btn"
-                        style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
-                    >
-                        &lt; Poprzednia
-                    </button>
-                    <span style={{ fontWeight: 'bold', color: '#555' }}>
-                        Strona {currentPage} z {totalPages}
-                    </span>
-                    <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="secondary-btn"
-                        style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
-                    >
-                        Następna &gt;
-                    </button>
+                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="secondary-btn">&lt;</button>
+                    <span> {currentPage} / {totalPages}</span>
+                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="secondary-btn">&gt;</button>
                 </div>
             )}
 
-            {/* MODAL DETALI */}
-            <Modal isOpen={isDetailsOpen} onClose={() => setDetailsOpen(false)} title={`Szczegóły Zadania`}>
+            {/*modal for details */}
+            <Modal isOpen={isDetailsOpen} onClose={() => setDetailsOpen(false)} title={`Task details`}>
                 {selectedTask && (
                     <>
-                        <div style={{ padding: '15px', background: '#e3f2fd', borderRadius: '5px', marginBottom: '15px', border: '1px solid #bbdefb' }}>
-                            <h4 style={{marginTop: 0, marginBottom: '10px', color: '#1565c0'}}>Przypisana Tablica</h4>
-                            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '5px'}}><strong>Nazwa Tablicy:</strong> <span>{selectedTask.board?.name || 'Usunięta lub brak'}</span></div>
-                            <div style={{display: 'flex', justifyContent: 'space-between'}}><strong>Board ID:</strong> <span>{selectedTask.boardId}</span></div>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginBottom: '20px', padding: '15px', background: '#f9f9f9', borderRadius: '5px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px', marginBottom: '20px', padding: '15px', background: '#f3f3f3', borderRadius: '5px' }}>
                             {Object.entries(selectedTask).map(([key, value]) => {
+                                {/*Mapujemy wszystkie elementy wyciągnięte z selected Task i formatujemy datę*/}
                                 if (typeof value === 'object' && value !== null) return null;
-                                if (key === 'boardId') return null;
                                 const displayValue = (key.includes('At') && value) || (key === 'deadline' && value) ? new Date(value).toLocaleString() : (value?.toString() || '-');
-                                return (<div key={key} style={{ borderBottom: '1px solid #eee', paddingBottom: '5px', display: 'flex', justifyContent: 'space-between' }}><strong style={{ textTransform: 'capitalize', color: '#555' }}>{key}: </strong><span style={{textAlign: 'right'}}>{displayValue}</span></div>);
+                                return (
+                                    <div key={key}><strong style={{ textTransform: 'capitalize', color: '#555555' }}>{key}: </strong><span>{displayValue}</span></div>);
                             })}
                         </div>
 
                         <div className="details-section">
-                            <h3>Członkowie Zadania ({taskMembers.length})</h3>
-                            {taskMembers.length > 0 ? (
+                            <h3>Task members ({getTaskMembers.length})</h3>
+                            {getTaskMembers.length > 0 ? (
                                 <>
                                     <table className="mini-table">
                                         <thead><tr><th>ID</th><th>Username</th><th>Rola</th></tr></thead>
                                         <tbody>
-                                        {/* Wyświetlamy tylko slice dla aktualnej strony modala */}
-                                        {getPaginatedData(taskMembers, membersPage).map(m => (
+                                        {/*client side pagination*/}
+                                        {getPaginatedData(getTaskMembers, membersPage).map(m => (
                                             <tr key={m.userId}>
                                                 <td>{m.userId}</td>
-                                                <td>{m.user?.username || 'Nieznany'}</td>
-                                                <td>{m.role === 'owner' ? <strong style={{color: '#d32f2f'}}>Owner</strong> : m.role}</td>
+                                                <td>{m.user.username}</td>
+                                                <td>{m.role}</td>
                                             </tr>
                                         ))}
                                         </tbody>
                                     </table>
-
-                                    {/* Paginacja w modalu */}
-                                    {renderPaginationControls(membersPage, taskMembers.length, setMembersPage)}
+                                    {renderPaginationControls(membersPage, getTaskMembers.length, setMembersPage)}
                                 </>
-                            ) : <p>Brak przypisanych członków.</p>}
+                            ) : <p>No assigned members</p>}
                         </div>
                     </>
                 )}
             </Modal>
 
-            {/* MODAL EDYCJI / DODAWANIA */}
-            <Modal isOpen={isEditOpen} onClose={closeEditModal} title={selectedTask ? "Edycja Zadania" : "Nowe Zadanie"}>
-                <form onSubmit={handleSave} style={{display:'flex', flexDirection:'column', gap:'15px'}}>
-                    <label><strong>Tytuł:</strong><input name="title" defaultValue={selectedTask?.title} required className="admin-input" style={{width: '100%', marginTop:'5px'}} /></label>
-                    <label><strong>Opis:</strong><textarea name="description" defaultValue={selectedTask?.description} className="admin-input" rows="3" style={{width: '100%', marginTop:'5px'}} /></label>
-                    <label><strong>Status:</strong><select name="status" defaultValue={selectedTask?.status || 'to do'} className="admin-select" style={{width: '100%', marginTop:'5px'}}><option value="to do">To Do</option><option value="in progress">In Progress</option><option value="completed">Completed</option></select></label>
-                    <label><strong>ID Tablicy (Board ID):</strong><input type="number" name="boardId" defaultValue={selectedTask?.boardId} required className="admin-input" style={{width: '100%', marginTop:'5px'}} /></label>
-                    <label><strong>Deadline:</strong><input type="date" name="deadline" defaultValue={selectedTask?.deadline ? new Date(selectedTask.deadline).toISOString().split('T')[0] : ''} className="admin-input" style={{width: '100%', marginTop:'5px'}} /></label>
+            {/*Modal for editing/adding the logic is the same, the key factor is if we select the task*/}
+            <Modal isOpen={isEditOpen} onClose={closeEditModal} title={selectedTask ? "Edit task" : "New task"}>
+                <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <label><strong>Title:</strong><input name="title" defaultValue={selectedTask?.title} required className="admin-input" style={{ width: '100%', marginTop: '5px' }} /></label>
+                    <label><strong>Description:</strong><textarea name="description" defaultValue={selectedTask?.description} className="admin-input" rows="3" style={{ width: '100%', marginTop: '5px' }} /></label>
+                    <label><strong>Status:</strong><select name="status" defaultValue={selectedTask?.status || 'to do'} className="admin-select" style={{ width: '100%', marginTop: '5px' }}><option value="to do">To Do</option><option value="completed">Completed</option></select></label>
+                    <label><strong>Board ID:</strong><input type="number" name="boardId" defaultValue={selectedTask?.boardId} required className="admin-input" style={{ width: '100%', marginTop: '5px' }} /></label>
+                    <label><strong>Deadline:</strong><input type="date" name="deadline" defaultValue={selectedTask?.deadline ? new Date() : ''} className="admin-input" style={{ width: '100%', marginTop: '5px' }} /></label>
 
-                    {actionError && <div className="error-message">⚠️ {actionError}</div>}
-                    <button className="primary-btn" style={{marginTop: '10px'}}>Zapisz zmiany</button>
+                    {/*only in edit - editing taskmembers*/}
+                    {selectedTask && (
+                        <div style={{ marginTop: '10px', padding: '15px', background: '#f0f0f0', borderRadius: '5px', border: '1px solid #ddd' }}>
+                            <h4 style={{ margin: '0 0 10px 0' }}>Assign taskmembers:</h4>
+
+                            {/* Current user list - only currentmembers*/}
+                            <ul style={{ paddingLeft: '20px', marginBottom: '15px' }}>
+                                {currentMembers.map(member => {
+                                    const isOwner = member.role === 'owner';
+                                    const displayName = member.user?.username;
+
+                                    return (
+                                        <li key={member.userId} style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>
+                                                <strong>{displayName}</strong>
+                                            </span>
+                                            {/*button to delete members who are not owners*/}
+                                            {!isOwner && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveMember(member.userId)}
+                                                    style={{ color: 'red', border: '1px solid red', background: 'transparent', borderRadius: '3px', cursor: 'pointer', padding: '2px 6px' }}>
+                                                    x
+                                                </button>
+                                            )}
+                                            {isOwner && <span style={{fontSize:'0.8rem', color:'#555555'}}>(owner)</span>}
+                                        </li>
+                                    );
+                                })}
+                                {currentMembers.length === 0 && <li>No assigned taskmembers</li>}
+                            </ul>
+
+                            {/* Add new taskmember */}
+                            <div style={{ display: 'flex', gap: '5px' }}>
+                                <select
+                                    className="admin-select"
+                                    value={selectedUserId}
+                                    onChange={(e) => setSelectedUserId(e.target.value)}
+                                    style={{ flex: 1 }}
+                                    size={6}>
+                                    <option value="">
+                                        {availableUsers.length > 0 ? "Add user:" : "No users available"}
+                                    </option>
+                                    {availableUsers.map(u => (
+                                        <option key={u.id} value={u.id}>{u.username} (ID: {u.id})</option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={handleAddMember}
+                                    disabled={!selectedUserId}
+                                    className="primary-btn"
+                                    >Add +
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {actionError && <div className="error-message">{actionError}</div>}
+                    <button className="primary-btn">Save changes</button>
                 </form>
             </Modal>
 
-            {/* MODAL USUWANIA */}
-            <Modal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} title="Potwierdź usunięcie">
+            {/* modal for deleting tasks */}
+            <Modal isOpen={isDeleteOpen} onClose={() => setDeleteOpen(false)} title={`Confirm deletion of task`}>
                 <div>
-                    <p>Czy na pewno chcesz usunąć zadanie: <strong>{taskToDelete?.title}</strong>?</p>
-                    {actionError && <div className="error-message">⚠️ {actionError}</div>}
+                    <p>Are you sure you want to delete task: <strong>{taskToDelete?.title}</strong>?</p>
+                    {actionError && <div className="error-message">{actionError}</div>}
                     <div className="modal-actions">
-                        <button onClick={() => setDeleteOpen(false)} className="secondary-btn">Anuluj</button>
-                        <button onClick={confirmDelete} className="danger-btn">Usuń</button>
+                        <button onClick={() => setDeleteOpen(false)} className="secondary-btn">Cancel</button>
+                        <button onClick={confirmDelete} className="danger-btn">Delete</button>
                     </div>
                 </div>
             </Modal>

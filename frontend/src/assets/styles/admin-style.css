@@ -79,12 +79,19 @@
     padding: 12px 15px;
     border-bottom: 1px solid #ededed;
     color: #353535;
+    max-width: 200px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-table td:last-child {
+    min-width: 205px;
 }
 
 .admin-table tr:hover { background-color: #f9f9f9; }
 
 .admin-table .action-btn {
-    margin-right: 5px;
+    margin-right: 4px;
     padding: 5px 10px;
     border: none;
     border-radius: 3px;
@@ -93,15 +100,15 @@
     color: white;
 }
 
-.admin-table .btn-details { background-color: #2196F3; }
-.admin-table .btn-edit { background-color: #FF9800; }
-.admin-table .btn-delete { background-color: #f44336; }
+.admin-table .btn-details { background-color: #349fff; }
+.admin-table .btn-edit { background-color: #ffb94c; }
+.admin-table .btn-delete { background-color: #ff584b; }
 
 .details-section h3 {
     border-bottom: 2px solid #efefef;
     padding-bottom: 5px;
     margin-top: 20px;
-    font-size: 1.1rem;
+    font-size: 1em;
     color: #474646;
 }
 
@@ -158,3 +165,31 @@
 .secondary-btn:hover {
     background-color: #d5d5d5;
 }
+
+.pagination-modal-btn
+{
+    background-color: #e0e0e0;
+    color: #353535;
+    border: none;
+    padding: 4px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination-modal-btn:hover
+{
+    background-color: #d5d5d5;
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-todo { background-color: #e3f2fd; color: #1c4b75; }
+.status-completed { background-color: #e8f5e9; color: #2e7d32; }
+

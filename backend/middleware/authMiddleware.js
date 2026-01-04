@@ -15,7 +15,7 @@ const authMiddleware = (req,res,next) => {
         req.user = jwt.verify(token, JWT_SECRET);
         next();
     } catch (error){
-        console.error("Token verification error", error.message);
+        console.error("Token verification error: ", error.message);
         return res.status(403).json({message: "Incorrect token error"});
     }
 

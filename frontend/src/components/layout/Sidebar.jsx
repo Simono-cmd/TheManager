@@ -7,10 +7,10 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
     const [boards, setBoards] = useState([]);
     const { user } = useAuth();
 
+    //states for modals
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalType, setModalType] = useState('create'); // 'create' | 'edit' | 'delete'
+    const [modalType, setModalType] = useState('create');
     const [targetBoard, setTargetBoard] = useState(null);
-    const [boardNameInput, setBoardNameInput] = useState('');
 
     useEffect(() => {
         refreshBoards();
@@ -28,7 +28,6 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
 
     const openCreateModal = () => {
         setModalType('create');
-        setBoardNameInput('');
         setTargetBoard(null);
         setIsModalOpen(true);
     };
@@ -36,7 +35,6 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
     const openEditModal = (e, board) => {
         e.stopPropagation();
         setModalType('edit');
-        setBoardNameInput(board.name);
         setTargetBoard(board);
         setIsModalOpen(true);
     };
@@ -48,44 +46,45 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
         setIsModalOpen(true);
     };
 
-    // --- LOGIKA ZATWIERDZANIA (SUBMIT) ---
+    // for creating/editing board
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
 
-        // 1. OBSŁUGA TWORZENIA
         if (modalType === 'create') {
-            if (!boardNameInput.trim()) return;
+            if (!data.name.trim()) return;
 
+            // for guest - temporary board
             if (user?.role === 'guest') {
-                const newBoard = { id: Date.now(), name: boardNameInput };
+                const newBoard = { id: Date.now(), name: data.name };
                 const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
                 localStorage.setItem('guest_boards', JSON.stringify([...current, newBoard]));
             } else {
-                await createBoard({ name: boardNameInput, ownerId: user.id });
+                await createBoard({ name: data.name, ownerId: user.id });
             }
         }
 
-        // 2. OBSŁUGA EDYCJI
         else if (modalType === 'edit' && targetBoard) {
-            if (!boardNameInput.trim()) return;
+            if (!data.name.trim()) return;
 
+            // for guest - temporary boards
             if (user?.role === 'guest') {
                 const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
-                const updated = current.map(b => b.id === targetBoard.id ? { ...b, name: boardNameInput } : b);
+                const updated = current.map(b => b.id === targetBoard.id ? { ...b, name: targetBoard.name } : b);
                 localStorage.setItem('guest_boards', JSON.stringify(updated));
             } else {
-                await updateBoard(targetBoard.id, { name: boardNameInput });
+                await updateBoard(targetBoard.id, { name: data.name });
             }
         }
-
-        // 3. OBSŁUGA USUWANIA
         else if (modalType === 'delete' && targetBoard) {
+
+            //for guest - deleting temporary board
             if (user?.role === 'guest') {
                 const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
                 const updated = current.filter(b => b.id !== targetBoard.id);
                 localStorage.setItem('guest_boards', JSON.stringify(updated));
-                // Jeśli usunięto aktywną tablicę, można obsłużyć odznaczenie w rodzicu (opcjonalnie)
             } else {
                 await deleteBoard(targetBoard.id);
             }
@@ -108,24 +107,24 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
                 <button className="add-btn" onClick={openCreateModal}>+</button>
             </div>
 
+            {/* list of all boards*/}
             <ul className="board-list">
                 {boards.map(board => (
                     <li key={board.id} className="board-item">
-                        <div
-                            className={`board-name ${selectedBoardId === board.id ? 'active' : ''}`}
+                        <div className={`board-name ${selectedBoardId === board.id ? 'active' : ''}`}
                             onClick={() => onSelectBoard(board)}
-                            style={{ cursor: 'pointer', width: '100%', padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                        >
+                            style={{ cursor: 'pointer', width: '100%', padding: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
                             <span style={{flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                                 {board.name}
                             </span>
 
                             <div className="actions" style={{display: 'flex', gap: '5px'}}>
-                                <button className="edit-btn" onClick={(e) => openEditModal(e, board)} title="Edytuj">
+                                <button className="edit-btn" onClick={(e) => openEditModal(e, board)} title="Edit">
                                     <img src="/media/edit.png" alt="edit" className="icon" style={{width: '16px', height: '16px'}}/>
                                 </button>
 
-                                <button className="delete-btn" onClick={(e) => openDeleteModal(e, board)} title="Usuń">
+                                <button className="delete-btn" onClick={(e) => openDeleteModal(e, board)} title="Delete">
                                     <img src="/media/delete.png" alt="delete" className="icon" style={{width: '16px', height: '16px'}}/>
                                 </button>
                             </div>
@@ -144,13 +143,12 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
 
                     {(modalType === 'create' || modalType === 'edit') && (
                         <div style={{ marginBottom: '15px' }}>
-                            <label style={{ display: 'block', marginBottom: '5px' }}>Nazwa tablicy:</label>
+                            <label style={{ display: 'block', marginBottom: '5px', color: '#555555'}}>Board name:</label>
                             <input
                                 type="text"
-                                value={boardNameInput}
-                                onChange={(e) => setBoardNameInput(e.target.value)}
-                                style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
-                                autoFocus
+                                name="name"
+                                defaultValue={modalType === 'edit' ? targetBoard.name : ''}
+                                style={{width: '100%', padding: '10px'}}
                             />
                         </div>
                     )}
@@ -163,19 +161,17 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
                     )}
 
                     <div className="modal-actions">
-                        <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                        <button type="button" className="secondary-btn" onClick={() => setIsModalOpen(false)}>Cancel</button>
 
                         <button
                             type="submit"
+                            className="secondary-btn"
                             style={{
                                 backgroundColor: modalType === 'delete' ? '#d32f2f' : '#4CAF50',
-                                color: 'white',
-                                border: 'none',
-                                padding: '8px 16px',
-                                cursor: 'pointer'
+                                color: 'white'
                             }}
                         >
-                            {modalType === 'create' ? 'Create' : modalType === 'edit' ? 'Save' : 'Delete'}
+                            <strong>{modalType === 'create' ? 'Create' : modalType === 'edit' ? 'Save' : 'Delete'}</strong>
                         </button>
                     </div>
                 </form>

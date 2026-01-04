@@ -384,9 +384,10 @@ const DashboardPage = () => {
                                             onChange={(e) => setSelectedUserId(e.target.value)}
                                             style={{ flex: 1, padding: '5px' }}
                                             disabled={availableUsers.length === 0}
+                                            size={6}
                                         >
                                             <option value="">
-                                                {availableUsers.length > 0 ? "Wybierz użytkownika" : "Wszyscy dostępni są już przypisani"}
+                                                {availableUsers.length > 0 ? "Add user:" : "No users available"}
                                             </option>
                                             {availableUsers.map(u => (
                                                 <option key={u.id} value={u.id}>{u.username}</option>

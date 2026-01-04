@@ -5,6 +5,8 @@ import "../assets/styles/login-style.css";
 import {useAuth} from "../hooks/useAuth.jsx";
 
 const RegisterPage = () => {
+
+    // stan kontrolowany - zapisujemy każdą zapisywaną literkę, służy głównie do pokazywania, ukrywania hasła
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -19,6 +21,7 @@ const RegisterPage = () => {
     useEffect(() => {
         document.title = "Register | TheManager"
     }, []);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -43,6 +46,7 @@ const RegisterPage = () => {
         e.preventDefault();
         setError('');
 
+        // obsługa rejestracji
         try {
             await registerUser(formData);
             setSuccess(true);
@@ -64,14 +68,11 @@ const RegisterPage = () => {
 
                 <p className="login-text">Create Account</p>
 
+                {/* wyświetlanie błędu*/}
                 {error && <p className="error-message">{error}</p>}
 
                 {success && (
-                    <p style={{
-                        color: '#4caf50',
-                        textAlign: 'center',
-                        marginBottom: '1em',
-                        fontWeight: 'bold'}}>
+                    <p className="success-text">
                         Account created! Redirecting...
                     </p>
                 )}

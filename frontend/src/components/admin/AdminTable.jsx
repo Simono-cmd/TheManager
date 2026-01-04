@@ -10,17 +10,21 @@ const AdminTable = ({ columns, data, actions }) => {
             <table className="admin-table">
                 <thead>
                 <tr>
+                    {/*nagłówki tabeli*/}
                     {columns.map((col) => (
                         <th key={col.key}>{col.label}</th>
                     ))}
-                    <th style={{width: '200px'}}>Actions</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
+                {/*wyciągamy każdy wiersz danych*/}
                 {data.map((row) => (
                     <tr key={row.id}>
+                        {/*wyciągamy każdą wartość*/}
                         {columns.map((col) => (
                             <td key={`${row.id}-${col.key}`}>
+                                {/*dla formatowania daty - render*/}
                                 {col.render ? col.render(row) : row[col.key]}
                             </td>
                         ))}

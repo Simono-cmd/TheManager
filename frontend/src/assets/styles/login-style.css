@@ -184,3 +184,13 @@
     background-color: #2c5f8e;
     color: white;
 }
+
+.success-text
+{
+    display: flex;
+    color: #4caf50;
+    justify-content: center;
+    align-items: center;
+
+
+}
