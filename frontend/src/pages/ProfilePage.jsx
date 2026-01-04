@@ -43,6 +43,7 @@ const ProfilePage = () => {
             })();}
     }, [user]);
 
+    // for cool colorful task status
     const getStatusClass = (status) => {
         switch(status?.toLowerCase()) {
             case 'completed': return 'status-completed';
@@ -93,62 +94,62 @@ const ProfilePage = () => {
                     <table className="tasks-table">
                         <thead>
                         <tr>
-                            <th style={{width: '35%'}}>Tytuł</th>
-                            <th>Tablica</th>
+                            <th>Title</th>
+                            <th>Table</th>
                             <th>Status</th>
-                            <th>Termin</th>
+                            <th>Deadline</th>
                         </tr>
                         </thead>
                         <tbody>
                         {ownedTasks.map(task => (
                             <tr key={task.id}>
                                 <td><strong>{task.title}</strong></td>
-                                <td>{task.board ? task.board.name : 'Usunięta'}</td>
+                                <td>{task.board?.name}</td>
                                 <td>
-                                        <span className={`status-badge ${getStatusClass(task.status)}`}>
-                                            {task.status}
-                                        </span>
+                                    <span className={`status-badge ${getStatusClass(task.status)}`}>
+                                        {task.status}
+                                    </span>
                                 </td>
-                                <td>{task.deadline ? new Date(task.deadline).toLocaleDateString('pl-PL') : '-'}</td>
+                                <td>{task.deadline ? new Date(task.deadline).toLocaleDateString() : '-'}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                 ) : (
-                    <p className="empty-message">Nie utworzyłeś jeszcze żadnych zadań.</p>
+                    <p className="empty-message">No tasks created by you</p>
                 )}
             </div>
 
-            {/* SEKCJA 3: PRZYPISANE ZADANIA */}
+            {/* section for tasks assigned to user*/}
             <div className="profile-section">
-                <h2 className="section-header blue-border">Zadania przypisane do mnie</h2>
+                <h2 className="section-header blue-border">Tasks assigned to me</h2>
                 {assignedTasks.length > 0 ? (
                     <table className="tasks-table">
                         <thead>
                         <tr>
-                            <th style={{width: '35%'}}>Tytuł</th>
-                            <th>Tablica</th>
+                            <th>Title</th>
+                            <th>Table</th>
                             <th>Status</th>
-                            <th>Termin</th>
+                            <th>Deadline</th>
                         </tr>
                         </thead>
                         <tbody>
                         {assignedTasks.map(task => (
                             <tr key={task.id}>
                                 <td><strong>{task.title}</strong></td>
-                                <td>{task.board ? task.board.name : 'Usunięta'}</td>
+                                <td>{task.board?.name}</td>
                                 <td>
-                                        <span className={`status-badge ${getStatusClass(task.status)}`}>
-                                            {task.status}
-                                        </span>
+                                    <span className={`status-badge ${getStatusClass(task.status)}`}>
+                                        {task.status}
+                                    </span>
                                 </td>
-                                <td>{task.deadline ? new Date(task.deadline).toLocaleDateString('pl-PL') : '-'}</td>
+                                <td>{task.deadline ? new Date(task.deadline).toLocaleDateString() : '-'}</td>
                             </tr>
                         ))}
                         </tbody>
                     </table>
                 ) : (
-                    <p className="empty-message">Brak zadań, do których zostałeś przypisany.</p>
+                    <p className="empty-message">No assigned tasks</p>
                 )}
             </div>
         </div></div>
