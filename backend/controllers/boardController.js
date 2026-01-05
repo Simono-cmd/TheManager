@@ -109,7 +109,7 @@ async function getBoardById(req, res) {
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {
-            whereCondition.ownerId = id;
+            whereCondition.ownerId = id; //if user is not admin, can only access his own board
         }
 
         const board = await Board.findOne({
@@ -136,7 +136,7 @@ async function updateBoard(req, res) {
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {
-            whereCondition.ownerId = id;
+            whereCondition.ownerId = id; //if user is not admin, can only access his own board
         }
 
         const board = await Board.findOne({ where: whereCondition });
@@ -173,7 +173,7 @@ async function deleteBoard(req, res) {
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {
-            whereCondition.ownerId = id;
+            whereCondition.ownerId = id; //if user is not admin, can only access his own board
         }
 
         const board = await Board.findOne({ where: whereCondition });
