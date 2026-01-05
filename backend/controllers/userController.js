@@ -50,18 +50,14 @@ async function createUser(req, res) {
     }
 }
 
-// for admin panel pagination
 async function getAllUsers(req, res) {
     try {
         if (req.user.role !== 'admin') {
             return res.status(403).json({ message: "Access denied" });
         }
 
-        //parametry z url - strona i elementy na stronę
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-
-        //ilość rekordów jakie pomijamy od początku
         const offset = (page - 1) * limit;
 
         const { count, rows } = await User.findAndCountAll({
@@ -115,18 +111,35 @@ async function updateUser(req, res) {
         }
 
         const { username, email, role, password } = req.body;
+        let updateData = {};
 
-        if (email && !emailRegex.test(email)) {
-            return res.status(400).json({ message: "Incorrect email format" });
+        if (email) {
+            if (!emailRegex.test(email)) {
+                return res.status(400).json({ message: "Incorrect email format" });
+            }
+            const existingEmail = await User.findOne({ where: { email } });
+            if (existingEmail && existingEmail.id !== targetId) {
+                return res.status(409).json({ message: "Email already taken" });
+            }
+            updateData.email = email;
         }
 
-        let updateData = { username, email };
+        if (username) {
+            const existingName = await User.findOne({ where: { username } });
+            if (existingName && existingName.id !== targetId) {
+                return res.status(409).json({ message: "Username already taken" });
+            }
+            updateData.username = username;
+        }
 
         if (req.user.role === 'admin' && role) {
             updateData.role = role;
         }
 
         if (password && password.trim() !== "") {
+            if (password.length < 6) {
+                return res.status(400).json({ message: "Password must be at least 6 characters long" });
+            }
             updateData.password = await bcrypt.hash(password, 10);
         }
 

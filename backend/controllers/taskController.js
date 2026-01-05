@@ -105,6 +105,8 @@ async function updateTask(req, res) {
     try {
         const userId = req.user.id;
         const userRole = req.user.role;
+        const { title, description, deadline, boardId, status } = req.body;
+
 
         const task = await Task.findByPk(req.params.id, {
             include: [{ model: Board, as: 'board' }]
@@ -114,6 +116,14 @@ async function updateTask(req, res) {
 
         if (userRole !== 'admin' && task.board.ownerId !== userId) {
             return res.status(403).json({ message: "Access denied" });
+        }
+
+        if (!boardId) {
+            return res.status(400).json({ message: "BoardID is required" });
+        }
+
+        if(!title) {
+            return res.status(400).json({ message: "Title is required" });
         }
 
         if (req.body.boardId && req.body.boardId !== task.boardId) {
