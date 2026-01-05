@@ -41,7 +41,7 @@ const Layout = () => {
                         <ul>
                             <li><Link to="/dashboard">Dashboard</Link></li>
 
-                            {user.role !== 'guest' && (
+                            {user?.role !== 'guest' && (
                                 <li><Link to="/profile">Profile</Link></li>
                             )}
 

@@ -29,6 +29,7 @@ const DashboardPage = () => {
     useEffect(() => {
         document.title = "Dashboard | TheManager";
         if (activeBoard) (async () => {
+            // eslint-disable-next-line react-hooks/immutability
             await fetchTasks(activeBoard.id);
         })();
         else setTasks([]);

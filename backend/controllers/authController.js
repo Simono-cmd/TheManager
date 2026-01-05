@@ -7,11 +7,14 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function register(req, res) {
     try {
-        const { username, email, password } = req.body;
+        let { username, email, password } = req.body;
 
         if (!username || !email || !password) {
             return res.status(400).json({ message: "All fields required" });
         }
+
+        email = email.trim().toLowerCase();
+        username = username.trim();
 
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: "Invalid email format" });

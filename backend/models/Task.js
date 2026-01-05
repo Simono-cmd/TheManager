@@ -32,7 +32,7 @@ module.exports=(sequelize) => {
             },
             deadline: {
                 type: DataTypes.DATE,
-                allowNull: false,
+                allowNull: true,
             }
         },
         {

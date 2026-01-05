@@ -107,7 +107,6 @@ async function updateTask(req, res) {
         const userRole = req.user.role;
         const { title, description, deadline, boardId, status } = req.body;
 
-
         const task = await Task.findByPk(req.params.id, {
             include: [{ model: Board, as: 'board' }]
         });
@@ -118,27 +117,39 @@ async function updateTask(req, res) {
             return res.status(403).json({ message: "Access denied" });
         }
 
-        if (!boardId) {
-            return res.status(400).json({ message: "BoardID is required" });
+        let updateData = {};
+
+        // if title is in req - it has to be not empty - this allows us to only update status (button complete task)
+        if (title !== undefined) {
+            if (title.trim() === '') {
+                return res.status(400).json({ message: "Title cannot be empty" });
+            }
+            updateData.title = title;
         }
 
-        if(!title) {
-            return res.status(400).json({ message: "Title is required" });
+        if (description !== undefined) updateData.description = description;
+        if (deadline !== undefined) updateData.deadline = deadline;
+        if (status) {
+            updateData.status = status;
         }
 
-        if (req.body.boardId && req.body.boardId !== task.boardId) {
-            const targetBoard = await Board.findByPk(req.body.boardId);
+        if (boardId && boardId !== task.boardId) {
+            const targetBoard = await Board.findByPk(boardId);
 
             if (!targetBoard) {
-                return res.status(404).json({ message: `Target Board with ID ${req.body.boardId} does not exist` });
+                return res.status(404).json({ message: `Target Board with ID ${boardId} does not exist` });
             }
 
             if (userRole !== 'admin' && targetBoard.ownerId !== userId) {
                 return res.status(403).json({ message: "You cannot move tasks to a board you don't own" });
             }
+            updateData.boardId = boardId;
         }
 
-        await task.update(req.body);
+        if (Object.keys(updateData).length > 0) {
+            await task.update(updateData);
+        }
+
         res.status(200).json(task);
     } catch (error) {
         res.status(400).json({ message: error.message });

@@ -24,7 +24,7 @@ Frontend:
 
 
 
-
+DANE DO TESTOWANIA: username: Admin, password: pass
 
 INSTRUKCJA URUCHOMIENIA APLIKACJI
 ---------------------------------
