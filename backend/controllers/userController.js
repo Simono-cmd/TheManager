@@ -23,11 +23,22 @@ async function createUser(req, res) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        let roletosave = 'user';
+
+        const requestByAdmin = req.user && req.user.role === 'admin';
+        if (requestByAdmin) {
+            if (role) {
+                roletosave = role;
+            } else {
+                roletosave = 'user';
+            }
+        }
+
         const user = await User.create({
             username,
             email,
             password: hashedPassword,
-            role: role || 'user'
+            role: roletosave
         });
 
         const userResponse = user.toJSON();
@@ -42,6 +53,9 @@ async function createUser(req, res) {
 // for admin panel pagination
 async function getAllUsers(req, res) {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied" });
+        }
 
         //parametry z url - strona i elementy na stronę
         const page = parseInt(req.query.page) || 1;
@@ -70,6 +84,10 @@ async function getAllUsers(req, res) {
 
 async function getUserById(req, res) {
     try {
+        if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const user = await User.findByPk(req.params.id, {
             attributes: { exclude: ['password'] }
         });
@@ -85,6 +103,12 @@ async function getUserById(req, res) {
 
 async function updateUser(req, res) {
     try {
+        const targetId = parseInt(req.params.id);
+
+        if (req.user.role !== 'admin' && req.user.id !== targetId) {
+            return res.status(403).json({ message: "You can only update your own profile" });
+        }
+
         const user = await User.findByPk(req.params.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -96,7 +120,11 @@ async function updateUser(req, res) {
             return res.status(400).json({ message: "Incorrect email format" });
         }
 
-        let updateData = { username, email, role };
+        let updateData = { username, email };
+
+        if (req.user.role === 'admin' && role) {
+            updateData.role = role;
+        }
 
         if (password && password.trim() !== "") {
             updateData.password = await bcrypt.hash(password, 10);
@@ -116,6 +144,10 @@ async function updateUser(req, res) {
 
 async function deleteUser(req, res) {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const user = await User.findByPk(req.params.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -129,6 +161,10 @@ async function deleteUser(req, res) {
 
 async function getBoardsByUser(req, res) {
     try {
+        if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const user = await User.findByPk(req.params.id, {
             include: { model: Board, as: 'boards' }
         });
@@ -141,6 +177,10 @@ async function getBoardsByUser(req, res) {
 
 async function getTasksByUser(req, res) {
     try {
+        if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const user = await User.findByPk(req.params.id, {
             attributes: { exclude: ['password'] },
             include: {
@@ -167,6 +207,10 @@ async function getTasksByUser(req, res) {
 
 async function getTaskMembersByUser(req, res) {
     try {
+        if (req.user.role !== 'admin' && req.user.id !== parseInt(req.params.id)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const taskMembers = await TaskMember.findAll({ where: { userId: req.params.id } });
         res.json(taskMembers);
     } catch (error) {

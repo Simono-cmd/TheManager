@@ -3,9 +3,15 @@ const { Board, User } = require('../models');
 // dashboard
 async function createBoard(req, res) {
     try {
+        const { name } = req.body;
         const ownerId = req.user.id;
+
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ message: "Board name is required" });
+        }
+
         const board = await Board.create({
-            ...req.body,
+            name,
             ownerId: ownerId
         });
 
@@ -18,10 +24,14 @@ async function createBoard(req, res) {
 // dla admin panel
 async function createBoardAdmin(req, res) {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const { name, ownerId } = req.body;
 
-        if (!ownerId) {
-            return res.status(400).json({ message: "OwnerID is required" });
+        if (!name || !ownerId) {
+            return res.status(400).json({ message: "Name and OwnerID are required" });
         }
 
         const userExists = await User.findByPk(ownerId);
@@ -51,7 +61,8 @@ async function getAllBoards(req, res) {
                 model: User,
                 as: 'user',
                 attributes: ['id', 'username']
-            }]
+            }],
+            order: [['createdAt', 'DESC']]
         });
         res.status(200).json(boards);
     } catch (error) {
@@ -62,6 +73,10 @@ async function getAllBoards(req, res) {
 // dla admin panel pagination
 async function getAllBoardsAdmin(req, res) {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
@@ -91,7 +106,6 @@ async function getAllBoardsAdmin(req, res) {
 async function getBoardById(req, res) {
     try {
         const { id, role } = req.user;
-
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {
@@ -119,7 +133,6 @@ async function getBoardById(req, res) {
 async function updateBoard(req, res) {
     try {
         const { id, role } = req.user;
-
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {
@@ -132,14 +145,22 @@ async function updateBoard(req, res) {
             return res.status(404).json({ message: "Board not found or access denied" });
         }
 
-        if (req.body.ownerId && role === 'admin') {
-            const userExists = await User.findByPk(req.body.ownerId);
-            if (!userExists) {
-                return res.status(404).json({ message: `Target user ID ${req.body.ownerId} does not exist.` });
-            }
+        const { name, ownerId } = req.body;
+        let updateData = {};
+
+        if (name && name.trim() !== '') {
+            updateData.name = name;
         }
 
-        await board.update(req.body);
+        if (role === 'admin' && ownerId) {
+            const userExists = await User.findByPk(ownerId);
+            if (!userExists) {
+                return res.status(404).json({ message: `Target user ID ${ownerId} does not exist.` });
+            }
+            updateData.ownerId = ownerId;
+        }
+
+        await board.update(updateData);
         res.status(200).json(board);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -149,7 +170,6 @@ async function updateBoard(req, res) {
 async function deleteBoard(req, res) {
     try {
         const { id, role } = req.user;
-
         const whereCondition = { id: req.params.id };
 
         if (role !== 'admin') {

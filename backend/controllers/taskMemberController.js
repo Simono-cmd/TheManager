@@ -1,13 +1,24 @@
-const { TaskMember, Task, User } = require('../models');
+const { TaskMember, Task, User, Board } = require('../models');
 
 async function addMember(req, res) {
     try {
         const { taskId, userId, role } = req.body;
 
-        const task = await Task.findByPk(taskId);
+        const task = await Task.findByPk(taskId, {
+            include: [{ model: Board, as: 'board' }]
+        });
+
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        if (req.user.role !== 'admin' && task.board.ownerId !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const user = await User.findByPk(userId);
-        if (!task || !user) {
-            return res.status(404).json({ message: "Task or User not found" });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
 
         const existingMember = await TaskMember.findOne({ where: { taskId, userId } });
@@ -30,6 +41,19 @@ async function addMember(req, res) {
 async function getMembersByTaskId(req, res) {
     try {
         const { taskId } = req.params;
+
+        const task = await Task.findByPk(taskId, {
+            include: [{ model: Board, as: 'board' }]
+        });
+
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        if (req.user.role !== 'admin' && task.board.ownerId !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const members = await TaskMember.findAll({
             where: { taskId },
             include: [{
@@ -48,6 +72,16 @@ async function updateMemberRole(req, res) {
     try {
         const { taskId, userId } = req.params;
         const { role } = req.body;
+
+        const task = await Task.findByPk(taskId, {
+            include: [{ model: Board, as: 'board' }]
+        });
+
+        if (!task) return res.status(404).json({ message: "Task not found" });
+
+        if (req.user.role !== 'admin' && task.board.ownerId !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
+        }
 
         const member = await TaskMember.findOne({ where: { taskId, userId } });
 
@@ -68,6 +102,16 @@ async function removeMember(req, res) {
     try {
         const { taskId, userId } = req.params;
 
+        const task = await Task.findByPk(taskId, {
+            include: [{ model: Board, as: 'board' }]
+        });
+
+        if (!task) return res.status(404).json({ message: "Task not found" });
+
+        if (req.user.role !== 'admin' && task.board.ownerId !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const deleted = await TaskMember.destroy({
             where: { taskId, userId }
         });
@@ -84,6 +128,10 @@ async function removeMember(req, res) {
 
 async function getAllTaskMembers(req, res) {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
         const members = await TaskMember.findAll({
             include: [
                 { model: User, as: 'user', attributes: ['username'] },
