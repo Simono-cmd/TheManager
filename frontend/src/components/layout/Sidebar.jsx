@@ -12,9 +12,7 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
     const [modalType, setModalType] = useState('create');
     const [targetBoard, setTargetBoard] = useState(null);
 
-    useEffect(() => {
-        refreshBoards();
-    }, [user]);
+
 
     const refreshBoards = () => {
         if (user?.role === 'guest') {
@@ -25,6 +23,10 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
         }
     };
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        refreshBoards();
+    }, [user]);
 
     const openCreateModal = () => {
         setModalType('create');
@@ -72,7 +74,7 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
             // for guest - temporary boards
             if (user?.role === 'guest') {
                 const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
-                const updated = current.map(b => b.id === targetBoard.id ? { ...b, name: targetBoard.name } : b);
+                const updated = current.map(b => b.id === targetBoard.id ? { ...b, name: data.name } : b);
                 localStorage.setItem('guest_boards', JSON.stringify(updated));
             } else {
                 await updateBoard(targetBoard.id, { name: data.name });
