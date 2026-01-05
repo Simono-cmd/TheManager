@@ -25,7 +25,13 @@ module.exports = (sequelize) => {
         }
     }, {
         tableName: 'task_members',
-        timestamps: false
+        timestamps: false,
+        indexes: [
+            {
+                unique: true,
+                fields: ['taskId', 'userId']
+            }
+        ]
     });
 
     return TaskMember;
