@@ -3,7 +3,7 @@ import AdminToolbar from '../../components/admin/AdminToolbar';
 import AdminTable from '../../components/admin/AdminTable';
 import Modal from '../../components/common/Modal';
 import { getAllTasks, deleteTask, updateTask, createTask } from '../../api/tasks.api';
-import {assignUserToTask, getMembersByTaskId, removeUserFromTask} from '../../api/taskMembers.api';
+import {assignUserToTask, getMembersByTaskId, removeUserFromTask, getAllTaskMembers} from '../../api/taskMembers.api';
 import {getAllUsers} from "../../api/users.api.js";
 import '../../assets/styles/admin-style.css';
 import {useAuth} from "../../hooks/useAuth.jsx";
@@ -28,7 +28,7 @@ const AdminTasksPage = () => {
     const [selectedTask, setSelectedTask] = useState(null);
     const [getTaskMembers, setGetTaskMembers] = useState([]);
 
-    //states for editing taskmembers
+    //states for editing taskmembers in task edit
     const [allUsers, setAllUsers] = useState([]);
     const [currentMembers, setCurrentMembers] = useState([]);
     const [selectedUserId, setSelectedUserId] = useState('');
@@ -36,6 +36,11 @@ const AdminTasksPage = () => {
     // modal pagination
     const [membersPage, setMembersPage] = useState(1);
     const MODAL_ITEMS_PER_PAGE = 5;
+
+    // all task members button states
+    const [isAllMembersModalOpen, setAllMembersModalOpen] = useState(false);
+    const [allTaskMembers, setAllTaskMembers] = useState([]);
+    const [allMembersPage, setAllMembersPage] = useState(1);
 
     // getting data in
     const fetchTasks = async (page) => {
@@ -228,6 +233,19 @@ const AdminTasksPage = () => {
     const safeAllUsers = Array.isArray(allUsers) ? allUsers : [];
     const availableUsers = safeAllUsers.filter(u => !currentMemberIds.includes(u.id));
 
+    //for all taskmembers button
+    const openAllMembersModal = async () =>{
+        try {
+            const data = await getAllTaskMembers();
+            setAllTaskMembers(data);
+            setAllMembersPage(1);
+            setAllMembersModalOpen(true);
+        }
+        catch(error){
+            setActionError("Error fetching taskmembers: " + error);
+        }
+    }
+
     return (
         <div className="admin-container">
             <AdminToolbar
@@ -253,6 +271,58 @@ const AdminTasksPage = () => {
                     <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="secondary-btn">&gt;</button>
                 </div>
             )}
+
+            {/* button for showing all task members */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', marginBottom: '20px' }}>
+            <button
+                onClick={openAllMembersModal}
+                className="primary-btn">
+                View all taskmembers
+            </button>
+            </div>
+
+            {/* modal - show all task members - whole table */}
+            <Modal isOpen={isAllMembersModalOpen} onClose={() => setAllMembersModalOpen(false)} title="All Task Members">
+                <div style={{ overflowX: 'auto' }}>
+                    <p style={{marginBottom: '10px', color: '#666'}}>Total records: {allTaskMembers.length}</p>
+                    {allTaskMembers.length > 0 ? (
+                        <>
+                            <table className="mini-table">
+                                <thead>
+                                <tr>
+                                    <th>Task ID</th>
+                                    <th>Task title</th>
+                                    <th>User ID</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Assigned At</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {getPaginatedData(allTaskMembers, allMembersPage).map((m) => (
+                                    <tr key={`${m.taskId}-${m.userId}`}>
+                                        <td>{m.taskId}</td>
+                                        <td>{m.task?.title}</td>
+                                        <td>{m.userId}</td>
+                                        <td>{m.user?.username}</td>
+                                        <td>
+                                            <span style={{color: m.role === 'owner' ? '#a81b1b' : '#02b02a'}}>
+                                                {m.role}
+                                            </span>
+                                        </td>
+                                        <td>{m.joinedAt ? new Date(m.joinedAt).toLocaleDateString() : '-'}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                            {renderPaginationControls(allMembersPage, allTaskMembers.length, setAllMembersPage)}
+                        </>
+                    ) : (
+                        <p>No task members found.</p>
+                    )}
+                </div>
+            </Modal>
+
 
             {/*modal for details */}
             <Modal isOpen={isDetailsOpen} onClose={() => setDetailsOpen(false)} title={`Task details`}>

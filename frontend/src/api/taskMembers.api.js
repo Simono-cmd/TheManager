@@ -1,5 +1,6 @@
 import api from './axios.js';
 
+//for adding members to a task - as member
 export const assignUserToTask = async (taskId, userId) => {
     const response = await api.post('/task-members', {
         taskId: taskId,

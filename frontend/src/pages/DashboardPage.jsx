@@ -183,7 +183,6 @@ const DashboardPage = () => {
         if(!selectedUserId || !selectedTask) return;
         try {
             await assignUserToTask(selectedTask.id, selectedUserId);
-            await assignUserToTask(selectedTask.id, selectedUserId);
             const m = await getMembersByTaskId(selectedTask.id);
             setCurrentMembers(m);
             setSelectedUserId('');
@@ -279,7 +278,7 @@ const DashboardPage = () => {
                     </div>
 
                     {/*edit*/}
-                    {selectedTask && (
+                    {selectedTask && user?.role !== 'guest' && (
                         <div style={{ marginTop: '10px', padding: '15px', background: '#f0f0f0', borderRadius: '5px', border: '1px solid #ddd' }}>
                             <h4 style={{ margin: '0 0 10px 0' }}>Assign task members:</h4>
                             {/* Current user list - only current members*/}
