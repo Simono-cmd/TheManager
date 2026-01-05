@@ -2,8 +2,6 @@
 
 PRAGMA foreign_keys = OFF;
 
-BEGIN TRANSACTION;
-
 --password: pass
 INSERT INTO Users (id, username, email, password, role, createdAt, updatedAt) VALUES
 (1, 'Admin', 'admin@test.com', '$2b$10$H/isggGenryQg7z0aW08hO3h6yluIK/HdWUt840l3zOgfLJlDpvl6', 'admin', DATETIME('now'), DATETIME('now')),
@@ -62,8 +60,11 @@ INSERT INTO task_members (taskId, userId, role, joinedAt) VALUES
 (6, 3, 'owner', DATETIME('now')),
 
 -- task 7: Admin owner
-(7, 1, 'owner', DATETIME('now'));
+(7, 1, 'owner', DATETIME('now')),
+(8, 1, 'owner', DATETIME('now')),
+(9, 1, 'owner', DATETIME('now'));
 
-COMMIT;
+
+
 
 PRAGMA foreign_keys = ON;
