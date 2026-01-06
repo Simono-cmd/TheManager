@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/index-style.css'; // Zmieniłem nazwę pliku dla porządku
+import '../assets/styles/index-style.css';
 
 function MainPage() {
     return (
@@ -22,7 +22,6 @@ function MainPage() {
             </header>
 
             <main className="landing-content">
-                {/* Sekcja 1: Tekst - Obraz */}
                 <section className="landing-section">
                     <div className="text-content">
                         <h1>Efektywne przydzielanie zadań</h1>
@@ -38,7 +37,6 @@ function MainPage() {
                     </div>
                 </section>
 
-                {/* Sekcja 2: Obraz - Tekst (Odwrócona kolejność na Desktopie) */}
                 <section className="landing-section reverse-layout">
                     <div className="image-content">
                         <img src="https://media.istockphoto.com/id/1280280320/vector/financial-statements-analysis-implementing-business-solutions-scaling-your-business.jpg?s=612x612&w=0&k=20&c=FbmiznzPGeBCzO34OENRwT0HvcPA0CHEauZc2jmbhzg=" alt="Business solutions" />
@@ -53,7 +51,6 @@ function MainPage() {
                     </div>
                 </section>
 
-                {/* Sekcja 3: Tekst - Obraz */}
                 <section className="landing-section">
                     <div className="text-content">
                         <h1>Monitoruj postępy i podejmuj lepsze decyzje</h1>
@@ -69,7 +66,6 @@ function MainPage() {
                     </div>
                 </section>
 
-                {/* Sekcja Podsumowania */}
                 <section className="summary-section">
                     <h2 className="summary-title">Dlaczego warto wybrać TheManager?</h2>
 
