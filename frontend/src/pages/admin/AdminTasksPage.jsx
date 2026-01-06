@@ -137,7 +137,7 @@ const AdminTasksPage = () => {
             setEditOpen(false);
             await fetchTasks(currentPage);
         } catch(e) {
-            const msg = e.message;
+            const msg = e.response?.data?.message;
             setActionError(msg);
         }
     };
@@ -160,7 +160,7 @@ const AdminTasksPage = () => {
             setTaskToDelete(null);
             await fetchTasks(currentPage);
         } catch(e) {
-            const msg = e.message;
+            const msg = e.response?.data?.message;
             setActionError(msg);
         }
     };

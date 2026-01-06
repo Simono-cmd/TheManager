@@ -48,7 +48,7 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
         setIsModalOpen(true);
     };
 
-    // for creating/editing board
+    // for pressing create, edit, delete button
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -81,7 +81,7 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
             }
         }
         else if (modalType === 'delete' && targetBoard) {
-
+            const isCurrentBoard = selectedBoardId === targetBoard.id;
             //for guest - deleting temporary board
             if (user?.role === 'guest') {
                 const current = JSON.parse(localStorage.getItem('guest_boards') || '[]');
@@ -89,6 +89,9 @@ const Sidebar = ({ onSelectBoard, selectedBoardId }) => {
                 localStorage.setItem('guest_boards', JSON.stringify(updated));
             } else {
                 await deleteBoard(targetBoard.id);
+            }
+            if (isCurrentBoard) {
+                onSelectBoard(null);
             }
         }
 
